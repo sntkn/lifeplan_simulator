@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function App() {
   // Basic Info
@@ -109,6 +110,10 @@ function App() {
     setSimulationResult(results);
   };
 
+  const formatYAxis = (tickItem: number) => {
+    return (tickItem / 10000).toLocaleString();
+  };
+
   return (
     <div className="App">
       <h1>ライフプランシミュレーター</h1>
@@ -144,51 +149,66 @@ function App() {
       <button onClick={calculate}>計算実行</button>
 
       {simulationResult.length > 0 && (
-        <div className="result-section">
-          <h2>計算結果</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>年齢</th>
-                <th>給与所得</th>
-                <th>不動産所得</th>
-                <th>収入合計</th>
-                <th>生活費</th>
-                <th>娯楽費</th>
-                <th>住宅維持費</th>
-                <th>医療・介護費</th>
-                <th>住宅ローン</th>
-                <th>支出合計</th>
-                <th>収支</th>
-                <th>株評価額</th>
-                <th>仮想通貨評価額</th>
-                <th>現金</th>
-                <th>総資産残高</th>
-              </tr>
-            </thead>
-            <tbody>
-              {simulationResult.map((res, index) => (
-                <tr key={index}>
-                  <td>{res.age}</td>
-                  <td>{res.salary.toLocaleString()}</td>
-                  <td>{res.realEstateIncome.toLocaleString()}</td>
-                  <td>{res.income.toLocaleString()}</td>
-                  <td>{res.livingExpenses.toLocaleString()}</td>
-                  <td>{res.entertainmentExpenses.toLocaleString()}</td>
-                  <td>{res.housingMaintenance.toLocaleString()}</td>
-                  <td>{res.medicalCare.toLocaleString()}</td>
-                  <td>{res.housingLoan.toLocaleString()}</td>
-                  <td>{res.expenses.toLocaleString()}</td>
-                  <td>{res.balance.toLocaleString()}</td>
-                  <td>{res.stockValue.toLocaleString()}</td>
-                  <td>{res.cryptoValue.toLocaleString()}</td>
-                  <td>{res.cashValue.toLocaleString()}</td>
-                  <td>{res.totalAssets.toLocaleString()}</td>
+        <>
+          <div className="result-section">
+            <h2>計算結果</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>年齢</th>
+                  <th>給与所得</th>
+                  <th>不動産所得</th>
+                  <th>収入合計</th>
+                  <th>生活費</th>
+                  <th>娯楽費</th>
+                  <th>住宅維持費</th>
+                  <th>医療・介護費</th>
+                  <th>住宅ローン</th>
+                  <th>支出合計</th>
+                  <th>収支</th>
+                  <th>株評価額</th>
+                  <th>仮想通貨評価額</th>
+                  <th>現金</th>
+                  <th>総資産残高</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {simulationResult.map((res, index) => (
+                  <tr key={index}>
+                    <td>{res.age}</td>
+                    <td>{res.salary.toLocaleString()}</td>
+                    <td>{res.realEstateIncome.toLocaleString()}</td>
+                    <td>{res.income.toLocaleString()}</td>
+                    <td>{res.livingExpenses.toLocaleString()}</td>
+                    <td>{res.entertainmentExpenses.toLocaleString()}</td>
+                    <td>{res.housingMaintenance.toLocaleString()}</td>
+                    <td>{res.medicalCare.toLocaleString()}</td>
+                    <td>{res.housingLoan.toLocaleString()}</td>
+                    <td>{res.expenses.toLocaleString()}</td>
+                    <td>{res.balance.toLocaleString()}</td>
+                    <td>{res.stockValue.toLocaleString()}</td>
+                    <td>{res.cryptoValue.toLocaleString()}</td>
+                    <td>{res.cashValue.toLocaleString()}</td>
+                    <td>{res.totalAssets.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="graph-section">
+            <h2>グラフ</h2>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={simulationResult}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="age" />
+                <YAxis tickFormatter={formatYAxis} />
+                <Tooltip formatter={(value: number) => `${(value / 10000).toLocaleString()}万円`} />
+                <Legend />
+                <Bar dataKey="totalAssets" fill="#8884d8" name="総資産残高（万円）" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </>
       )}
     </div>
   );
