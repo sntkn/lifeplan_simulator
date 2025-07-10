@@ -10,7 +10,7 @@
 .container {
   display: flex;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   gap: 20px;
 }
 
@@ -19,7 +19,6 @@
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  background-color: #000;
 }
 
 .input-section h2 {
@@ -94,6 +93,3 @@ td {
   text-align: right;
 }
 
-th {
-  background-color: #f2f2f2;
-}
