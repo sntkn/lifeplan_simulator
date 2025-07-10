@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import './App.css';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -132,9 +132,9 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
         }
       }
       
-      if (stockValue < 0) stockValue = 0;
-      if (cryptoValue < 0) cryptoValue = 0;
-      if (cashValue < 0) cashValue = 0;
+      //if (stockValue < 0) stockValue = 0;
+      //if (cryptoValue < 0) cryptoValue = 0;
+      //if (cashValue < 0) cashValue = 0;
 
       const totalAssets = stockValue + cryptoValue + cashValue;
       yearlyTotalAssets.push(totalAssets);
@@ -188,81 +188,81 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
   };
 
   return (
-    <div className="input-section" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-      <h2>シミュレーション設定</h2>
+    <div className="w-[300px] p-5 border rounded-lg" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+      <h2 className="text-lg font-bold mt-0 mb-4">シミュレーション設定</h2>
       
-      <div className="input-group">
-        <h3>基本項目</h3>
-        <label>初期年齢</label>
-        <input type="number" value={params.initialAge} onChange={e => handleChange('initialAge', e.target.value)} />
-        <label>インフレ率</label>
-        <input type="number" step="0.01" value={params.inflationRate} onChange={e => handleChange('inflationRate', e.target.value)} />
-        <label>期待リターン（年率）</label>
-        <input type="number" step="0.01" value={params.investmentReturnRate} onChange={e => handleChange('investmentReturnRate', e.target.value)} />
-        <label>リスク（標準偏差）</label>
-        <input type="number" step="0.01" value={params.investmentRisk} onChange={e => handleChange('investmentRisk', e.target.value)} />
-        <label>株売却時のコスト（税金等）</label>
-        <input type="number" step="0.01" value={params.stockTaxRate} onChange={e => handleChange('stockTaxRate', e.target.value)} />
-        <label>仮想通貨売却時のコスト（税金等）</label>
-        <input type="number" step="0.01" value={params.cryptoTaxRate} onChange={e => handleChange('cryptoTaxRate', e.target.value)} />
-        <label>現金保有の上限（万円）</label>
-        <input type="number" value={params.cashUpperLimit / JPY_UNIT} onChange={e => handleManYenChange('cashUpperLimit', e.target.value)} />
-        <label>現金保有の下限（万円）</label>
-        <input type="number" value={params.cashLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cashLowerLimit', e.target.value)} />
-        <label>仮想通貨保有の下限（万円）</label>
-        <input type="number" value={params.cryptoLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cryptoLowerLimit', e.target.value)} />
+      <div className="mb-5">
+        <h3 className="text-base font-bold mb-3">基本項目</h3>
+        <label className="block mb-1 font-bold">初期年齢</label>
+        <input type="number" value={params.initialAge} onChange={e => handleChange('initialAge', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">インフレ率</label>
+        <input type="number" step="0.01" value={params.inflationRate} onChange={e => handleChange('inflationRate', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">期待リターン（年率）</label>
+        <input type="number" step="0.01" value={params.investmentReturnRate} onChange={e => handleChange('investmentReturnRate', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">リスク（標準偏差）</label>
+        <input type="number" step="0.01" value={params.investmentRisk} onChange={e => handleChange('investmentRisk', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">株売却時のコスト（税金等）</label>
+        <input type="number" step="0.01" value={params.stockTaxRate} onChange={e => handleChange('stockTaxRate', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">仮想通貨売却時のコスト（税金等）</label>
+        <input type="number" step="0.01" value={params.cryptoTaxRate} onChange={e => handleChange('cryptoTaxRate', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">現金保有の上限（万円）</label>
+        <input type="number" value={params.cashUpperLimit / JPY_UNIT} onChange={e => handleManYenChange('cashUpperLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">現金保有の下限（万円）</label>
+        <input type="number" value={params.cashLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cashLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">仮想通貨保有の下限（万円）</label>
+        <input type="number" value={params.cryptoLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cryptoLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
       </div>
 
-      <div className="input-group">
-        <h3>資産初期値（万円）</h3>
-        <label>株保有額</label>
-        <input type="number" value={params.initialStockValue / JPY_UNIT} onChange={e => handleManYenChange('initialStockValue', e.target.value)} />
-        <label>仮想通貨保有額</label>
-        <input type="number" value={params.initialCryptoValue / JPY_UNIT} onChange={e => handleManYenChange('initialCryptoValue', e.target.value)} />
-        <label>現金</label>
-        <input type="number" value={params.initialCashValue / JPY_UNIT} onChange={e => handleManYenChange('initialCashValue', e.target.value)} />
+      <div className="mb-5">
+        <h3 className="text-base font-bold mb-3">資産初期値（万円）</h3>
+        <label className="block mb-1 font-bold">株保有額</label>
+        <input type="number" value={params.initialStockValue / JPY_UNIT} onChange={e => handleManYenChange('initialStockValue', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">仮想通貨保有額</label>
+        <input type="number" value={params.initialCryptoValue / JPY_UNIT} onChange={e => handleManYenChange('initialCryptoValue', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">現金</label>
+        <input type="number" value={params.initialCashValue / JPY_UNIT} onChange={e => handleManYenChange('initialCashValue', e.target.value)} className="w-full p-2 border rounded box-border" />
       </div>
 
-      <div className="input-group">
-        <h3>年間支出（万円）</h3>
-        <label>生活費</label>
-        <input type="number" value={params.livingExpenses / JPY_UNIT} onChange={e => handleManYenChange('livingExpenses', e.target.value)} />
-        <label>娯楽費</label>
-        <input type="number" value={params.entertainmentExpenses / JPY_UNIT} onChange={e => handleManYenChange('entertainmentExpenses', e.target.value)} />
-        <label>住宅維持費</label>
-        <input type="number" value={params.housingMaintenance / JPY_UNIT} onChange={e => handleManYenChange('housingMaintenance', e.target.value)} />
-        <label>医療・介護費</label>
-        <input type="number" value={params.medicalCare / JPY_UNIT} onChange={e => handleManYenChange('medicalCare', e.target.value)} />
-        <label>住宅ローン</label>
-        <input type="number" value={params.housingLoan / JPY_UNIT} onChange={e => handleManYenChange('housingLoan', e.target.value)} />
+      <div className="mb-5">
+        <h3 className="text-base font-bold mb-3">年間支出（万円）</h3>
+        <label className="block mb-1 font-bold">生活費</label>
+        <input type="number" value={params.livingExpenses / JPY_UNIT} onChange={e => handleManYenChange('livingExpenses', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">娯楽費</label>
+        <input type="number" value={params.entertainmentExpenses / JPY_UNIT} onChange={e => handleManYenChange('entertainmentExpenses', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">住宅維持費</label>
+        <input type="number" value={params.housingMaintenance / JPY_UNIT} onChange={e => handleManYenChange('housingMaintenance', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">医療・介護費</label>
+        <input type="number" value={params.medicalCare / JPY_UNIT} onChange={e => handleManYenChange('medicalCare', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">住宅ローン</label>
+        <input type="number" value={params.housingLoan / JPY_UNIT} onChange={e => handleManYenChange('housingLoan', e.target.value)} className="w-full p-2 border rounded box-border" />
       </div>
 
-      <div className="input-group">
-        <h3>年間収入（万円）</h3>
-        <label>給与所得</label>
-        <input type="number" value={params.salary / JPY_UNIT} onChange={e => handleManYenChange('salary', e.target.value)} />
-        <label>不動産所得</label>
-        <input type="number" value={params.realEstateIncome / JPY_UNIT} onChange={e => handleManYenChange('realEstateIncome', e.target.value)} />
+      <div className="mb-5">
+        <h3 className="text-base font-bold mb-3">年間収入（万円）</h3>
+        <label className="block mb-1 font-bold">給与所得</label>
+        <input type="number" value={params.salary / JPY_UNIT} onChange={e => handleManYenChange('salary', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">不動産所得</label>
+        <input type="number" value={params.realEstateIncome / JPY_UNIT} onChange={e => handleManYenChange('realEstateIncome', e.target.value)} className="w-full p-2 border rounded box-border" />
       </div>
 
-      <div className="input-group">
-        <h3>モンテカルロ設定</h3>
-        <label>シミュレーション回数</label>
-        <input type="number" value={params.numSimulations} onChange={e => handleChange('numSimulations', e.target.value)} />
+      <div className="mb-5">
+        <h3 className="text-base font-bold mb-3">モンテカルロ設定</h3>
+        <label className="block mb-1 font-bold">シミュレーション回数</label>
+        <input type="number" value={params.numSimulations} onChange={e => handleChange('numSimulations', e.target.value)} className="w-full p-2 border rounded box-border" />
       </div>
 
-      <div className="simulation-controls">
-        <button onClick={onSimulate}>シミュレーション実行</button>
+      <div className="mt-5">
+        <button onClick={onSimulate} className="w-full p-2.5 border rounded-t-full rounded-b-full cursor-pointer text-base">シミュレーション実行</button>
       </div>
     </div>
   );
 };
 
 const AssetChart = ({ data }: { data: YearlyData[] }) => {
-  const formatYAxis = (tick: number) => `${(tick / 10000).toLocaleString()}万円`;
+  const formatYAxis = (tick: number) => `${(tick / 1000000).toLocaleString()}`;
 
   return (
-    <div className="graph-section">
+    <div className="w-full h-[500px] mb-5">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -306,6 +306,13 @@ function App() {
 
   const [simulationData, setSimulationData] = useState<YearlyData[] | null>(null);
 
+  // ダークモード切り替え
+  const [dark, setDark] = useState(true);
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+  }, [dark]);
+  const toggleDarkMode = () => setDark(d => !d);
+
   const handleSimulate = () => {
     const data = runMonteCarloSimulation(params);
     setSimulationData(data);
@@ -319,32 +326,40 @@ function App() {
   }, [simulationData, simulationPeriod]);
 
   return (
-    <div className="App">
-      <h1>老後資産推移モンテカルロシミュレーター</h1>
-      <div className="container">
+    <div className="bg-white dark:bg-gray-900 dark:text-gray-100 min-h-screen p-5 text-center flex flex-col items-center transition-colors">
+      {/* ダークモード切り替えスイッチ */}
+      <button
+        onClick={toggleDarkMode}
+        className="fixed top-4 right-4 px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow transition"
+        aria-label="ダークモード切替"
+      >
+        {dark ? "ライトモード" : "ダークモード"}
+      </button>
+      <h1 className="text-3xl font-bold mb-5">老後資産推移モンテカルロシミュレーター</h1>
+      <div className="flex w-full max-w-7xl gap-5">
         <InputPanel params={params} setParams={setParams} onSimulate={handleSimulate} />
-        <div className="main-content">
+        <div className="flex-1 flex flex-col">
           {simulationData ? (
             <>
               <AssetChart data={simulationData} />
-              <div className="result-section">
-                <h2>シミュレーション結果（5年ごと）</h2>
-                <table>
+              <div className="w-full overflow-x-auto">
+                <h2 className="text-xl font-bold mb-3">シミュレーション結果（5年ごと）</h2>
+                <table className="w-full border-collapse">
                   <thead>
                     <tr>
-                      <th>年齢</th>
-                      <th>資産額中央値</th>
-                      <th>上位10%</th>
-                      <th>下位10%</th>
+                      <th className="border p-2 text-right">年齢</th>
+                      <th className="border p-2 text-right">資産額中央値</th>
+                      <th className="border p-2 text-right">上位10%</th>
+                      <th className="border p-2 text-right">下位10%</th>
                     </tr>
                   </thead>
                   <tbody>
                     {summaryData.map(d => (
                       <tr key={d.year}>
-                        <td>{d.age}歳</td>
-                        <td>{Math.round(d.median / 10000).toLocaleString()}万円</td>
-                        <td>{Math.round(d.p90 / 10000).toLocaleString()}万円</td>
-                        <td>{Math.round(d.p10 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{d.age}歳</td>
+                        <td className="border p-2 text-right">{Math.round(d.median / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.round(d.p90 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.round(d.p10 / 10000).toLocaleString()}万円</td>
                       </tr>
                     ))}
                   </tbody>
@@ -352,7 +367,7 @@ function App() {
               </div>
             </>
           ) : (
-            <div className="graph-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="w-full h-[500px] mb-5 flex items-center justify-center">
               <p>左のパネルで設定を入力し、「シミュレーション実行」ボタンを押してください。</p>
             </div>
           )}
