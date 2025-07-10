@@ -1,215 +1,214 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import './App.css';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-function App() {
-  // Basic Info
-  const [age, setAge] = useState(30);
-  const [inflationRate, setInflationRate] = useState(1.02);
-  const [investmentReturnRate, setInvestmentReturnRate] = useState(1.07);
-  const [stockTaxRate, setStockTaxRate] = useState(1.1);
-  const [cryptoTaxRate, setCryptoTaxRate] = useState(1.3);
-  const [cashUpperLimit, setCashUpperLimit] = useState(20000000);
-  const [cashLowerLimit, setCashLowerLimit] = useState(15000000);
-  const [cryptoLowerLimit, setCryptoLowerLimit] = useState(10000000);
+// --- Types ---
+type SimulationParams = {
+  initialAge: number;
+  simulationPeriod: number;
+  initialAssets: number;
+  annualInvestment: number;
+  investmentReturnRate: number;
+  investmentRisk: number;
+  annualLivingExpenses: number;
+  inflationRate: number;
+  numSimulations: number;
+};
 
-  // Initial Assets
-  const [stockValue, setStockValue] = useState(125000000);
-  const [cryptoValue, setCryptoValue] = useState(50000000);
-  const [cashValue, setCashValue] = useState(50000000);
+type YearlyData = {
+  year: number;
+  age: number;
+  [key: string]: number;
+};
 
-  // Annual Expenses
-  const [livingExpenses, setLivingExpenses] = useState(3000000);
-  const [entertainmentExpenses, setEntertainmentExpenses] = useState(1000000);
-  const [housingMaintenance, setHousingMaintenance] = useState(600000);
-  const [medicalCare, setMedicalCare] = useState(750000);
-  const [housingLoan, setHousingLoan] = useState(210000);
+// --- Monte Carlo Simulation Logic ---
+const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
+  const { 
+    initialAge, simulationPeriod, initialAssets, annualInvestment, 
+    investmentReturnRate, investmentRisk, annualLivingExpenses, 
+    inflationRate, numSimulations 
+  } = params;
 
-  // Annual Income
-  const [salary, setSalary] = useState(4500000);
-  const [realEstateIncome, setRealEstateIncome] = useState(1000000);
+  const results: number[][] = [];
 
-  const [simulationResult, setSimulationResult] = useState<any[]>([]);
+  for (let i = 0; i < numSimulations; i++) {
+    let assets = initialAssets;
+    let livingExpenses = annualLivingExpenses;
+    const yearlyAssets: number[] = [assets];
 
-  const calculate = () => {
-    let currentAge = age;
-    let currentStockValue = stockValue;
-    let currentCryptoValue = cryptoValue;
-    let currentCashValue = cashValue;
-    let currentLivingExpenses = livingExpenses;
-    let currentEntertainmentExpenses = entertainmentExpenses;
-    let currentHousingMaintenance = housingMaintenance;
-    let currentMedicalCare = medicalCare;
-    let currentRealEstateIncome = realEstateIncome;
-
-    const results = [];
-
-    for (let i = 0; i < 100 - age; i++) {
-      const currentSalary = currentAge <= 55 ? salary : 0;
-      const income = currentSalary + currentRealEstateIncome;
-
-      if (currentAge >= 75) {
-        currentEntertainmentExpenses *= 0.9;
-      }
-      const expenses =
-        currentLivingExpenses +
-        currentEntertainmentExpenses +
-        currentHousingMaintenance +
-        (currentAge >= 75 ? currentMedicalCare : 0) +
-        (i < 30 ? housingLoan : 0);
-
-      const balance = income - expenses;
-      currentCashValue += balance;
-
-      if (currentCashValue > cashUpperLimit) {
-        const surplus = currentCashValue - cashUpperLimit;
-        currentStockValue += surplus;
-        currentCashValue = cashUpperLimit;
-      }
-
-      if (currentCashValue < cashLowerLimit) {
-        const deficit = cashLowerLimit - currentCashValue;
-        if (currentCryptoValue - deficit * cryptoTaxRate >= cryptoLowerLimit) {
-          currentCryptoValue -= deficit * cryptoTaxRate;
-          currentCashValue += deficit;
-        } else {
-          currentStockValue -= deficit * stockTaxRate;
-          currentCashValue += deficit;
-        }
-      }
-
-      const totalAssets = currentStockValue + currentCryptoValue + currentCashValue;
-
-      results.push({
-        age: currentAge,
-        salary: currentSalary,
-        realEstateIncome: Math.round(currentRealEstateIncome),
-        income: Math.round(income),
-        livingExpenses: Math.round(currentLivingExpenses),
-        entertainmentExpenses: Math.round(currentEntertainmentExpenses),
-        housingMaintenance: Math.round(currentHousingMaintenance),
-        medicalCare: currentAge >= 75 ? Math.round(currentMedicalCare) : 0,
-        housingLoan: i < 30 ? housingLoan : 0,
-        expenses: Math.round(expenses),
-        balance: Math.round(balance),
-        stockValue: Math.round(currentStockValue),
-        cryptoValue: Math.round(currentCryptoValue),
-        cashValue: Math.round(currentCashValue),
-        totalAssets: Math.round(totalAssets),
-      });
-
-      currentAge++;
-      currentLivingExpenses *= inflationRate;
-      currentEntertainmentExpenses *= inflationRate;
-      currentHousingMaintenance *= inflationRate;
-      currentMedicalCare *= inflationRate;
-      currentRealEstateIncome *= inflationRate;
-      currentStockValue *= investmentReturnRate;
-      currentCryptoValue *= investmentReturnRate;
+    for (let year = 1; year <= simulationPeriod; year++) {
+      const randomFactor = Math.random() * 2 - 1; // -1 to 1
+      const annualReturn = investmentReturnRate + randomFactor * investmentRisk;
+      assets = assets * (1 + annualReturn) + annualInvestment - livingExpenses;
+      if (assets < 0) assets = 0;
+      
+      livingExpenses *= (1 + inflationRate);
+      yearlyAssets.push(assets);
     }
-    setSimulationResult(results);
-  };
+    results.push(yearlyAssets);
+  }
 
-  const formatYAxis = (tickItem: number) => {
-    return (tickItem / 10000).toLocaleString();
+  // --- Process results for charting ---
+  const chartData: YearlyData[] = [];
+  for (let year = 0; year <= simulationPeriod; year++) {
+    const yearlyOutcomes = results.map(sim => sim[year]);
+    yearlyOutcomes.sort((a, b) => a - b);
+
+    const yearData: YearlyData = {
+      year: year,
+      age: initialAge + year,
+      median: yearlyOutcomes[Math.floor(numSimulations / 2)],
+      p90: yearlyOutcomes[Math.floor(numSimulations * 0.9)],
+      p10: yearlyOutcomes[Math.floor(numSimulations * 0.1)],
+    };
+    chartData.push(yearData);
+  }
+
+  return chartData;
+};
+
+// --- UI Components ---
+const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParams, setParams: (p: SimulationParams) => void, onSimulate: () => void }) => {
+  const handleChange = (field: keyof SimulationParams, value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      setParams({ ...params, [field]: numValue });
+    }
   };
 
   return (
-    <div className="App">
-      <h1>ライフプランシミュレーター</h1>
-
-      <div className="input-section">
-        <h2>基本項目</h2>
-        <label>年齢: <input type="number" value={age} onChange={e => setAge(Number(e.target.value))} /></label>
-        <label>インフレ率: <input type="number" step="0.01" value={inflationRate} onChange={e => setInflationRate(Number(e.target.value))} /></label>
-        <label>投資名目リターン: <input type="number" step="0.01" value={investmentReturnRate} onChange={e => setInvestmentReturnRate(Number(e.target.value))} /></label>
-        <label>株を取り崩す際の税率: <input type="number" step="0.01" value={stockTaxRate} onChange={e => setStockTaxRate(Number(e.target.value))} /></label>
-        <label>仮想通貨を取り崩す際の税率: <input type="number" step="0.01" value={cryptoTaxRate} onChange={e => setCryptoTaxRate(Number(e.target.value))} /></label>
-        <label>現金保有の上限金額: <input type="number" value={cashUpperLimit} onChange={e => setCashUpperLimit(Number(e.target.value))} /></label>
-        <label>現金保有の下限金額: <input type="number" value={cashLowerLimit} onChange={e => setCashLowerLimit(Number(e.target.value))} /></label>
-        <label>仮想通貨保有の下限金額: <input type="number" value={cryptoLowerLimit} onChange={e => setCryptoLowerLimit(Number(e.target.value))} /></label>
-
-        <h2>資産初期値</h2>
-        <label>株保有額: <input type="number" value={stockValue} onChange={e => setStockValue(Number(e.target.value))} /></label>
-        <label>仮想通貨保有額: <input type="number" value={cryptoValue} onChange={e => setCryptoValue(Number(e.target.value))} /></label>
-        <label>現金: <input type="number" value={cashValue} onChange={e => setCashValue(Number(e.target.value))} /></label>
-
-        <h2>年間支出項目</h2>
-        <label>生活費: <input type="number" value={livingExpenses} onChange={e => setLivingExpenses(Number(e.target.value))} /></label>
-        <label>娯楽費: <input type="number" value={entertainmentExpenses} onChange={e => setEntertainmentExpenses(Number(e.target.value))} /></label>
-        <label>住宅維持費: <input type="number" value={housingMaintenance} onChange={e => setHousingMaintenance(Number(e.target.value))} /></label>
-        <label>医療・介護費: <input type="number" value={medicalCare} onChange={e => setMedicalCare(Number(e.target.value))} /></label>
-        <label>住宅ローン: <input type="number" value={housingLoan} onChange={e => setHousingLoan(Number(e.target.value))} /></label>
-
-        <h2>年間収入項目</h2>
-        <label>給与所得: <input type="number" value={salary} onChange={e => setSalary(Number(e.target.value))} /></label>
-        <label>不動産所得: <input type="number" value={realEstateIncome} onChange={e => setRealEstateIncome(Number(e.target.value))} /></label>
+    <div className="input-section">
+      <h2>シミュレーション設定</h2>
+      <div className="input-group">
+        <label>初期年齢</label>
+        <input type="number" value={params.initialAge} onChange={e => handleChange('initialAge', e.target.value)} />
       </div>
+      <div className="input-group">
+        <label>シミュレーション期間（年）</label>
+        <input type="number" value={params.simulationPeriod} onChange={e => handleChange('simulationPeriod', e.target.value)} />
+      </div>
+      <div className="input-group">
+        <label>初期資産額</label>
+        <input type="number" value={params.initialAssets} onChange={e => handleChange('initialAssets', e.target.value)} />
+      </div>
+      <div className="input-group">
+        <label>年間投資額</label>
+        <input type="number" value={params.annualInvestment} onChange={e => handleChange('annualInvestment', e.target.value)} />
+      </div>
+      <div className="input-group">
+        <label>期待リターン（年率）</label>
+        <input type="number" step="0.01" value={params.investmentReturnRate} onChange={e => handleChange('investmentReturnRate', e.target.value)} />
+      </div>
+      <div className="input-group">
+        <label>リスク（標準偏差）</label>
+        <input type="number" step="0.01" value={params.investmentRisk} onChange={e => handleChange('investmentRisk', e.target.value)} />
+      </div>
+      <div className="input-group">
+        <label>年間生活費</label>
+        <input type="number" value={params.annualLivingExpenses} onChange={e => handleChange('annualLivingExpenses', e.target.value)} />
+      </div>
+      <div className="input-group">
+        <label>インフレ率（年率）</label>
+        <input type="number" step="0.01" value={params.inflationRate} onChange={e => handleChange('inflationRate', e.target.value)} />
+      </div>
+      <div className="input-group">
+        <label>シミュレーション回数</label>
+        <input type="number" value={params.numSimulations} onChange={e => handleChange('numSimulations', e.target.value)} />
+      </div>
+      <div className="simulation-controls">
+        <button onClick={onSimulate}>シミュレーション実行</button>
+      </div>
+    </div>
+  );
+};
 
-      <button onClick={calculate}>計算実行</button>
+const AssetChart = ({ data }: { data: YearlyData[] }) => {
+  const formatYAxis = (tick: number) => `${(tick / 10000).toLocaleString()}万円`;
 
-      {simulationResult.length > 0 && (
-        <>
-          <div className="result-section">
-            <h2>計算結果</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>年齢</th>
-                  <th>給与所得</th>
-                  <th>不動産所得</th>
-                  <th>収入合計</th>
-                  <th>生活費</th>
-                  <th>娯楽費</th>
-                  <th>住宅維持費</th>
-                  <th>医療・介護費</th>
-                  <th>住宅ローン</th>
-                  <th>支出合計</th>
-                  <th>収支</th>
-                  <th>株評価額</th>
-                  <th>仮想通貨評価額</th>
-                  <th>現金</th>
-                  <th>総資産残高</th>
-                </tr>
-              </thead>
-              <tbody>
-                {simulationResult.map((res, index) => (
-                  <tr key={index}>
-                    <td>{res.age}</td>
-                    <td>{res.salary.toLocaleString()}</td>
-                    <td>{res.realEstateIncome.toLocaleString()}</td>
-                    <td>{res.income.toLocaleString()}</td>
-                    <td>{res.livingExpenses.toLocaleString()}</td>
-                    <td>{res.entertainmentExpenses.toLocaleString()}</td>
-                    <td>{res.housingMaintenance.toLocaleString()}</td>
-                    <td>{res.medicalCare.toLocaleString()}</td>
-                    <td>{res.housingLoan.toLocaleString()}</td>
-                    <td>{res.expenses.toLocaleString()}</td>
-                    <td>{res.balance.toLocaleString()}</td>
-                    <td>{res.stockValue.toLocaleString()}</td>
-                    <td>{res.cryptoValue.toLocaleString()}</td>
-                    <td>{res.cashValue.toLocaleString()}</td>
-                    <td>{res.totalAssets.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="graph-section">
-            <h2>グラフ</h2>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={simulationResult}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="age" />
-                <YAxis tickFormatter={formatYAxis} />
-                <Tooltip formatter={(value: number) => `${(value / 10000).toLocaleString()}万円`} />
-                <Legend />
-                <Bar dataKey="totalAssets" fill="#8884d8" name="総資産残高（万円）" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </>
-      )}
+  return (
+    <div className="graph-section">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="age" name="年齢" />
+          <YAxis tickFormatter={formatYAxis} />
+          <Tooltip formatter={(value: number) => `${(value / 10000).toLocaleString()}万円`} />
+          <Legend />
+          <Line type="monotone" dataKey="median" stroke="#8884d8" name="資産額中央値" dot={false} />
+          <Line type="monotone" dataKey="p90" stroke="#82ca9d" name="上位10%" dot={false} />
+          <Line type="monotone" dataKey="p10" stroke="#ffc658" name="下位10%" dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+// --- Main App Component ---
+function App() {
+  const [params, setParams] = useState<SimulationParams>({
+    initialAge: 30,
+    simulationPeriod: 40,
+    initialAssets: 10000000,
+    annualInvestment: 1200000,
+    investmentReturnRate: 0.05,
+    investmentRisk: 0.15,
+    annualLivingExpenses: 4000000,
+    inflationRate: 0.02,
+    numSimulations: 1000,
+  });
+
+  const [simulationData, setSimulationData] = useState<YearlyData[] | null>(null);
+
+  const handleSimulate = () => {
+    const data = runMonteCarloSimulation(params);
+    setSimulationData(data);
+  };
+
+  const summaryData = useMemo(() => {
+    if (!simulationData) return [];
+    return simulationData.filter(d => d.year % 5 === 0 || d.year === params.simulationPeriod);
+  }, [simulationData, params.simulationPeriod]);
+
+  return (
+    <div className="App">
+      <h1>老後資産推移モンテカルロシミュレーター</h1>
+      <div className="container">
+        <InputPanel params={params} setParams={setParams} onSimulate={handleSimulate} />
+        <div className="main-content">
+          {simulationData ? (
+            <>
+              <AssetChart data={simulationData} />
+              <div className="result-section">
+                <h2>シミュレーション結果（5年ごと）</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>年齢</th>
+                      <th>資産額中央値</th>
+                      <th>上位10%</th>
+                      <th>下位10%</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summaryData.map(d => (
+                      <tr key={d.year}>
+                        <td>{d.age}歳</td>
+                        <td>{Math.round(d.median / 10000).toLocaleString()}万円</td>
+                        <td>{Math.round(d.p90 / 10000).toLocaleString()}万円</td>
+                        <td>{Math.round(d.p10 / 10000).toLocaleString()}万円</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className="graph-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <p>左のパネルで設定を入力し、「シミュレーション実行」ボタンを押してください。</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
