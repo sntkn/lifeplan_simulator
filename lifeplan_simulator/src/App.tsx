@@ -171,6 +171,15 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
 
 // --- UI Components ---
 const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParams, setParams: (p: SimulationParams) => void, onSimulate: () => void }) => {
+  const JPY_UNIT = 10000;
+
+  const handleManYenChange = (field: keyof SimulationParams, value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      setParams({ ...params, [field]: numValue * JPY_UNIT });
+    }
+  };
+
   const handleChange = (field: keyof SimulationParams, value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
@@ -196,44 +205,44 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         <input type="number" step="0.01" value={params.stockTaxRate} onChange={e => handleChange('stockTaxRate', e.target.value)} />
         <label>仮想通貨売却時のコスト（税金等）</label>
         <input type="number" step="0.01" value={params.cryptoTaxRate} onChange={e => handleChange('cryptoTaxRate', e.target.value)} />
-        <label>現金保有の上限</label>
-        <input type="number" value={params.cashUpperLimit} onChange={e => handleChange('cashUpperLimit', e.target.value)} />
-        <label>現金保有の下限</label>
-        <input type="number" value={params.cashLowerLimit} onChange={e => handleChange('cashLowerLimit', e.target.value)} />
-        <label>仮想通貨保有の下限</label>
-        <input type="number" value={params.cryptoLowerLimit} onChange={e => handleChange('cryptoLowerLimit', e.target.value)} />
+        <label>現金保有の上限（万円）</label>
+        <input type="number" value={params.cashUpperLimit / JPY_UNIT} onChange={e => handleManYenChange('cashUpperLimit', e.target.value)} />
+        <label>現金保有の下限（万円）</label>
+        <input type="number" value={params.cashLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cashLowerLimit', e.target.value)} />
+        <label>仮想通貨保有の下限（万円）</label>
+        <input type="number" value={params.cryptoLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cryptoLowerLimit', e.target.value)} />
       </div>
 
       <div className="input-group">
-        <h3>資産初期値</h3>
+        <h3>資産初期値（万円）</h3>
         <label>株保有額</label>
-        <input type="number" value={params.initialStockValue} onChange={e => handleChange('initialStockValue', e.target.value)} />
+        <input type="number" value={params.initialStockValue / JPY_UNIT} onChange={e => handleManYenChange('initialStockValue', e.target.value)} />
         <label>仮想通貨保有額</label>
-        <input type="number" value={params.initialCryptoValue} onChange={e => handleChange('initialCryptoValue', e.target.value)} />
+        <input type="number" value={params.initialCryptoValue / JPY_UNIT} onChange={e => handleManYenChange('initialCryptoValue', e.target.value)} />
         <label>現金</label>
-        <input type="number" value={params.initialCashValue} onChange={e => handleChange('initialCashValue', e.target.value)} />
+        <input type="number" value={params.initialCashValue / JPY_UNIT} onChange={e => handleManYenChange('initialCashValue', e.target.value)} />
       </div>
 
       <div className="input-group">
-        <h3>年間支出</h3>
+        <h3>年間支出（万円）</h3>
         <label>生活費</label>
-        <input type="number" value={params.livingExpenses} onChange={e => handleChange('livingExpenses', e.target.value)} />
+        <input type="number" value={params.livingExpenses / JPY_UNIT} onChange={e => handleManYenChange('livingExpenses', e.target.value)} />
         <label>娯楽費</label>
-        <input type="number" value={params.entertainmentExpenses} onChange={e => handleChange('entertainmentExpenses', e.target.value)} />
+        <input type="number" value={params.entertainmentExpenses / JPY_UNIT} onChange={e => handleManYenChange('entertainmentExpenses', e.target.value)} />
         <label>住宅維持費</label>
-        <input type="number" value={params.housingMaintenance} onChange={e => handleChange('housingMaintenance', e.target.value)} />
+        <input type="number" value={params.housingMaintenance / JPY_UNIT} onChange={e => handleManYenChange('housingMaintenance', e.target.value)} />
         <label>医療・介護費</label>
-        <input type="number" value={params.medicalCare} onChange={e => handleChange('medicalCare', e.target.value)} />
+        <input type="number" value={params.medicalCare / JPY_UNIT} onChange={e => handleManYenChange('medicalCare', e.target.value)} />
         <label>住宅ローン</label>
-        <input type="number" value={params.housingLoan} onChange={e => handleChange('housingLoan', e.target.value)} />
+        <input type="number" value={params.housingLoan / JPY_UNIT} onChange={e => handleManYenChange('housingLoan', e.target.value)} />
       </div>
 
       <div className="input-group">
-        <h3>年間収入</h3>
+        <h3>年間収入（万円）</h3>
         <label>給与所得</label>
-        <input type="number" value={params.salary} onChange={e => handleChange('salary', e.target.value)} />
+        <input type="number" value={params.salary / JPY_UNIT} onChange={e => handleManYenChange('salary', e.target.value)} />
         <label>不動産所得</label>
-        <input type="number" value={params.realEstateIncome} onChange={e => handleChange('realEstateIncome', e.target.value)} />
+        <input type="number" value={params.realEstateIncome / JPY_UNIT} onChange={e => handleManYenChange('realEstateIncome', e.target.value)} />
       </div>
 
       <div className="input-group">
