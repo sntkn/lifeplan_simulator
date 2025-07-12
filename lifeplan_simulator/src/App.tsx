@@ -4,46 +4,79 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 
 // --- Types ---
 type SimulationParams = {
-  // Basic Info
+  /** シミュレーション開始時の年齢 */
   initialAge: number;
+  /** 仕事をリタイアする年齢 */
+  retirementAge: number;
+  /** ローン年数 */
+  loanDuration: number;
+  /** 年間医療・介護費が発生する年齢 */
+  medicalCareStartAge: number;
+  /** 娯楽費が減少し始める年齢 */
+  entertainmentExpensesDeclineStartAge: number;
+  /** インフレ率 */
   inflationRate: number;
+  /** 投資の期待リターン（年率） */
   investmentReturnRate: number;
+  /** 投資のリスク（標準偏差） */
   investmentRisk: number;
+  /** 株式売却時の税金・手数料率 */
   stockTaxRate: number;
+  /** 仮想通貨売却時の税金・手数料率 */
   cryptoTaxRate: number;
+  /** 現金保有額の上限 */
   cashUpperLimit: number;
+  /** 現金保有額の下限 */
   cashLowerLimit: number;
+  /** 仮想通貨保有額の下限 */
   cryptoLowerLimit: number;
 
-  // Initial Assets
+  /** 初期資産（株式） */
   initialStockValue: number;
+  /** 初期資産（仮想通貨） */
   initialCryptoValue: number;
+  /** 初期資産（現金） */
   initialCashValue: number;
 
-  // Annual Expenses
+  /** 年間生活費 */
   livingExpenses: number;
+  /** 年間娯楽費 */
   entertainmentExpenses: number;
+  /** 年間住宅維持費 */
   housingMaintenance: number;
+  /** 年間医療・介護費 */
   medicalCare: number;
+  /** 年間住宅ローン返済額 */
   housingLoan: number;
 
-  // Annual Income
+  /** 年間給与所得 */
   salary: number;
+  /** 年間不動産所得 */
   realEstateIncome: number;
 
-  // Monte Carlo specific
+  /** モンテカルロシミュレーションの実行回数 */
   numSimulations: number;
 };
 
 type YearlyData = {
+  /** シミュレーションの年 */
   year: number;
+  /** 年齢 */
   age: number;
+  /** 資産額の中央値 */
   median: number;
+  /** 資産額の上位10% */
   p90: number;
+  /** 資産額の下位10% */
   p10: number;
 };
 
 // --- Monte Carlo Simulation Logic ---
+/**
+ * モンテカルロシミュレーションを実行します。
+ * @param params シミュレーションのパラメータ
+ * @returns シミュレーション結果の配列
+ */
 const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
   const {
     initialAge,
@@ -94,19 +127,19 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
       cryptoValue *= (1 + annualReturn);
 
       // Income
-      const currentSalary = currentAge <= 55 ? salary : 0;
+      const currentSalary = currentAge <= params.retirementAge ? salary : 0;
       const income = currentSalary + currentRealEstateIncome;
 
       // Expenses
-      if (currentAge >= 75) {
+      if (currentAge >= params.entertainmentExpensesDeclineStartAge) {
         currentEntertainmentExpenses *= 0.9;
       }
       const expenses =
         currentLivingExpenses +
         currentEntertainmentExpenses +
         currentHousingMaintenance +
-        (currentAge >= 75 ? currentMedicalCare : 0) +
-        (year - 1 < 30 ? housingLoan : 0);
+        (currentAge >= params.medicalCareStartAge ? currentMedicalCare : 0) +
+        (year - 1 < params.loanDuration ? housingLoan : 0);
 
       // Balance and rebalancing
       const balance = income - expenses;
@@ -170,9 +203,23 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
 
 
 // --- UI Components ---
+/**
+ * シミュレーション設定の入力パネルコンポーネントです。
+ * @param params シミュレーションのパラメータ
+ * @param setParams パラメータを更新する関数
+ * @param onSimulate シミュレーションを実行する関数
+ */
 const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParams, setParams: (p: SimulationParams) => void, onSimulate: () => void }) => {
+  /**
+   * 万円単位を円単位に変換するための定数
+   */
   const JPY_UNIT = 10000;
 
+  /**
+   * 万円単位の入力値を円単位に変換して状態を更新します。
+   * @param field 更新するパラメータのフィールド名
+   * @param value 入力値
+   */
   const handleManYenChange = (field: keyof SimulationParams, value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
@@ -180,6 +227,11 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
     }
   };
 
+  /**
+   * 入力値を数値に変換して状態を更新します。
+   * @param field 更新するパラメータのフィールド名
+   * @param value 入力値
+   */
   const handleChange = (field: keyof SimulationParams, value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
@@ -211,6 +263,14 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         <input type="number" value={params.cashLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cashLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">仮想通貨保有の下限（万円）</label>
         <input type="number" value={params.cryptoLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cryptoLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">仕事をリタイアする年齢</label>
+        <input type="number" value={params.retirementAge} onChange={e => handleChange('retirementAge', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">ローン年数</label>
+        <input type="number" value={params.loanDuration} onChange={e => handleChange('loanDuration', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">年間医療・介護費が発生する年齢</label>
+        <input type="number" value={params.medicalCareStartAge} onChange={e => handleChange('medicalCareStartAge', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">娯楽費が減少し始める年齢</label>
+        <input type="number" value={params.entertainmentExpensesDeclineStartAge} onChange={e => handleChange('entertainmentExpensesDeclineStartAge', e.target.value)} className="w-full p-2 border rounded box-border" />
       </div>
 
       <div className="mb-5">
@@ -258,7 +318,16 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
   );
 };
 
+/**
+ * 資産推移のグラフコンポーネントです。
+ * @param data グラフに表示するデータ
+ */
 const AssetChart = ({ data }: { data: YearlyData[] }) => {
+  /**
+   * Y軸の目盛りを万円単位でフォーマットする関数
+   * @param tick 目盛りの値
+   * @returns フォーマットされた文字列
+   */
   const formatYAxis = (tick: number) => `${(tick / 1000000).toLocaleString()}`;
 
   return (
@@ -279,10 +348,19 @@ const AssetChart = ({ data }: { data: YearlyData[] }) => {
   );
 };
 
-// --- Main App Component ---
+/**
+ * アプリケーションのメインコンポーネントです。
+ */
 function App() {
+  /**
+   * シミュレーションのパラメータを管理する状態
+   */
   const [params, setParams] = useState<SimulationParams>({
     initialAge: 30,
+    retirementAge: 55,
+    loanDuration: 30,
+    medicalCareStartAge: 75,
+    entertainmentExpensesDeclineStartAge: 75,
     inflationRate: 0.02,
     investmentReturnRate: 0.07,
     investmentRisk: 0.15,
@@ -304,22 +382,39 @@ function App() {
     numSimulations: 1000,
   });
 
+  /**
+   * シミュレーション結果のデータを管理する状態
+   */
   const [simulationData, setSimulationData] = useState<YearlyData[] | null>(null);
 
-  // ダークモード切り替え
+  /**
+   * ダークモードの状態を管理する状態
+   */
   const [dark, setDark] = useState(true);
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
   }, [dark]);
+  /**
+   * ダークモードを切り替える関数
+   */
   const toggleDarkMode = () => setDark(d => !d);
 
+  /**
+   * シミュレーションを実行し、結果を状態に保存する関数
+   */
   const handleSimulate = () => {
     const data = runMonteCarloSimulation(params);
     setSimulationData(data);
   };
 
+  /**
+   * シミュレーション期間
+   */
   const simulationPeriod = useMemo(() => 100 - params.initialAge, [params.initialAge]);
 
+  /**
+   * 5年ごとのシミュレーション結果のサマリーデータ
+   */
   const summaryData = useMemo(() => {
     if (!simulationData) return [];
     return simulationData.filter(d => d.year % 5 === 0 || d.year === simulationPeriod);
