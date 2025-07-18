@@ -32,6 +32,8 @@ type SimulationParams = {
   cryptoLowerLimit: number;
   /** 株式保有額の下限 */
   stockLowerLimit: number;
+  /** 現金が下限を下回った場合に取り崩す資産の優先順位 */
+  liquidationPriority: 'crypto' | 'stock';
 
   /** 初期資産（株式） */
   initialStockValue: number;
@@ -159,12 +161,22 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
         // To get 'deficit' in cash, we need to sell more than 'deficit' worth of assets due to tax.
         // The tax rate parameter is a multiplier for how much asset to sell.
         // e.g., stockTaxRate = 1.1 means for 1 yen deficit, sell 1.1 yen of stock.
-        if (cryptoValue - deficit * cryptoTaxRate >= cryptoLowerLimit) {
-          cryptoValue -= deficit * cryptoTaxRate;
-          cashValue += deficit;
-        } else {
-          stockValue -= deficit * stockTaxRate;
-          cashValue += deficit;
+        if (params.liquidationPriority === 'crypto') {
+          if (cryptoValue - deficit * cryptoTaxRate >= cryptoLowerLimit) {
+            cryptoValue -= deficit * cryptoTaxRate;
+            cashValue += deficit;
+          } else {
+            stockValue -= deficit * stockTaxRate;
+            cashValue += deficit;
+          }
+        } else { // liquidationPriority is 'stock'
+          if (stockValue - deficit * stockTaxRate >= stockLowerLimit) {
+            stockValue -= deficit * stockTaxRate;
+            cashValue += deficit;
+          } else {
+            cryptoValue -= deficit * cryptoTaxRate;
+            cashValue += deficit;
+          }
         }
       }
 
@@ -274,6 +286,11 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         <input type="number" value={params.cryptoLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cryptoLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">株保有額の下限（万円）</label>
         <input type="number" value={params.stockLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('stockLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">現金不足時の優先取り崩し資産</label>
+        <select value={params.liquidationPriority} onChange={e => setParams({ ...params, liquidationPriority: e.target.value as 'crypto' | 'stock' })} className="w-full p-2 border rounded box-border">
+          <option value="crypto">仮想通貨</option>
+          <option value="stock">株式</option>
+        </select>
         <label className="block mb-1 font-bold">仕事をリタイアする年齢</label>
         <input type="number" value={params.retirementAge} onChange={e => handleChange('retirementAge', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">ローン年数</label>
@@ -381,6 +398,7 @@ function App() {
     cashLowerLimit: 15000000,
     cryptoLowerLimit: 10000000,
     stockLowerLimit: 0,
+    liquidationPriority: 'crypto',
     initialStockValue: 125000000,
     initialCryptoValue: 50000000,
     initialCashValue: 50000000,
