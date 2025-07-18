@@ -157,38 +157,53 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
       }
 
       if (cashValue < cashLowerLimit) {
-        const deficit = cashLowerLimit - cashValue;
-        // To get 'deficit' in cash, we need to sell more than 'deficit' worth of assets due to tax.
-        // The tax rate parameter is a multiplier for how much asset to sell.
-        // e.g., stockTaxRate = 1.1 means for 1 yen deficit, sell 1.1 yen of stock.
+        let deficit = cashLowerLimit - cashValue;
+
+        const liquidate = (priorityAsset: 'crypto' | 'stock') => {
+          if (deficit <= 0) return;
+
+          const assetValue = priorityAsset === 'crypto' ? cryptoValue : stockValue;
+          const assetLowerLimit = priorityAsset === 'crypto' ? cryptoLowerLimit : stockLowerLimit;
+          const taxRate = priorityAsset === 'crypto' ? cryptoTaxRate : stockTaxRate;
+          
+          const availableToSell = assetValue - assetLowerLimit;
+          if (availableToSell > 0) {
+            const sellAmount = Math.min(deficit * taxRate, availableToSell);
+            if (priorityAsset === 'crypto') {
+              cryptoValue -= sellAmount;
+            } else {
+              stockValue -= sellAmount;
+            }
+            const cashGained = sellAmount / taxRate;
+            cashValue += cashGained;
+            deficit -= cashGained;
+          }
+        };
+
         if (params.liquidationPriority === 'crypto') {
-          if (cryptoValue - deficit * cryptoTaxRate >= cryptoLowerLimit) {
-            cryptoValue -= deficit * cryptoTaxRate;
-            cashValue += deficit;
-          } else {
-            stockValue -= deficit * stockTaxRate;
-            cashValue += deficit;
-          }
-        } else { // liquidationPriority is 'stock'
-          if (stockValue - deficit * stockTaxRate >= stockLowerLimit) {
-            stockValue -= deficit * stockTaxRate;
-            cashValue += deficit;
-          } else {
-            cryptoValue -= deficit * cryptoTaxRate;
-            cashValue += deficit;
-          }
+          liquidate('crypto');
+          liquidate('stock');
+        } else {
+          liquidate('stock');
+          liquidate('crypto');
         }
       }
+
+      //if (stockValue < 0) stockValue = 0;
+      //if (cryptoValue < 0) cryptoValue = 0;
+      //if (cashValue < 0) cashValue = 0;
 
       if (stockValue < stockLowerLimit) {
         const deficit = stockLowerLimit - stockValue;
         cashValue -= deficit;
         stockValue += deficit;
       }
-      
-      //if (stockValue < 0) stockValue = 0;
-      //if (cryptoValue < 0) cryptoValue = 0;
-      //if (cashValue < 0) cashValue = 0;
+
+      if (cryptoValue < cryptoLowerLimit) {
+        const deficit = cryptoLowerLimit - cryptoValue;
+        cashValue -= deficit;
+        cryptoValue += deficit;
+      }
 
       const totalAssets = stockValue + cryptoValue + cashValue;
       yearlyTotalAssets.push(totalAssets);
