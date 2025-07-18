@@ -30,6 +30,8 @@ type SimulationParams = {
   cashLowerLimit: number;
   /** 仮想通貨保有額の下限 */
   cryptoLowerLimit: number;
+  /** 株式保有額の下限 */
+  stockLowerLimit: number;
 
   /** 初期資産（株式） */
   initialStockValue: number;
@@ -88,6 +90,7 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
     cashUpperLimit,
     cashLowerLimit,
     cryptoLowerLimit,
+    stockLowerLimit,
     initialStockValue,
     initialCryptoValue,
     initialCashValue,
@@ -163,6 +166,12 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
           stockValue -= deficit * stockTaxRate;
           cashValue += deficit;
         }
+      }
+
+      if (stockValue < stockLowerLimit) {
+        const deficit = stockLowerLimit - stockValue;
+        cashValue -= deficit;
+        stockValue += deficit;
       }
       
       //if (stockValue < 0) stockValue = 0;
@@ -263,6 +272,8 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         <input type="number" value={params.cashLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cashLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">仮想通貨保有の下限（万円）</label>
         <input type="number" value={params.cryptoLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cryptoLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">株保有額の下限（万円）</label>
+        <input type="number" value={params.stockLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('stockLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">仕事をリタイアする年齢</label>
         <input type="number" value={params.retirementAge} onChange={e => handleChange('retirementAge', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">ローン年数</label>
@@ -369,6 +380,7 @@ function App() {
     cashUpperLimit: 20000000,
     cashLowerLimit: 15000000,
     cryptoLowerLimit: 10000000,
+    stockLowerLimit: 0,
     initialStockValue: 125000000,
     initialCryptoValue: 50000000,
     initialCashValue: 50000000,
