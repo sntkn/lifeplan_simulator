@@ -658,7 +658,7 @@ function App() {
   const [params, setParams] = useState<SimulationParams>({
     initialAge: 30,
     retirementAge: 65,
-    loanDuration: 30,
+    loanDuration: 35,
     medicalCareStartAge: 75,
     entertainmentExpensesDeclineStartAge: 75,
     inflationRate: 0.01,
@@ -681,7 +681,7 @@ function App() {
     housingMaintenance: 600000,
     medicalCare: 750000,
     housingLoan: 210000,
-    salary: 300000,
+    salary: 3000000,
     realEstateIncome: 0,
     numSimulations: 1000,
   });
