@@ -22,10 +22,14 @@ type SimulationParams = {
   entertainmentExpensesDeclineStartAge: number;
   /** インフレ率 */
   inflationRate: number;
-  /** 投資の期待リターン（年率） */
+  /** 株式の期待リターン（年率） */
   investmentReturnRate: number;
-  /** 投資のリスク（標準偏差） */
+  /** 株式のリスク（標準偏差） */
   investmentRisk: number;
+  /** 仮想通貨の期待リターン（年率） */
+  cryptoReturnRate: number;
+  /** 仮想通貨のリスク（標準偏差） */
+  cryptoRisk: number;
   /** 株式売却時の税金・手数料率 */
   stockTaxRate: number;
   /** 仮想通貨売却時の税金・手数料率 */
@@ -99,6 +103,8 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
     inflationRate,
     investmentReturnRate,
     investmentRisk,
+    cryptoReturnRate,
+    cryptoRisk,
     stockTaxRate,
     cryptoTaxRate,
     cashUpperLimit,
@@ -144,10 +150,12 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
       const currentAge = initialAge + year - 1;
 
       // Apply investment returns (stochastic)
-      const randomFactor = Math.random() * 2 - 1; // -1 to 1
-      const annualReturn = investmentReturnRate + randomFactor * investmentRisk;
-      stockValue *= (1 + annualReturn);
-      cryptoValue *= (1 + annualReturn);
+      const stockRandomFactor = Math.random() * 2 - 1; // -1 to 1
+      const cryptoRandomFactor = Math.random() * 2 - 1; // -1 to 1
+      const stockAnnualReturn = investmentReturnRate + stockRandomFactor * investmentRisk;
+      const cryptoAnnualReturn = cryptoReturnRate + cryptoRandomFactor * cryptoRisk;
+      stockValue *= (1 + stockAnnualReturn);
+      cryptoValue *= (1 + cryptoAnnualReturn);
 
       // Income
       const currentSalary = currentAge <= params.retirementAge ? salary : 0;
@@ -499,10 +507,14 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         <input type="number" value={params.initialAge} onChange={e => handleChange('initialAge', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">インフレ率</label>
         <input type="number" step="0.01" value={params.inflationRate} onChange={e => handleChange('inflationRate', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">期待リターン（年率）</label>
+        <label className="block mb-1 font-bold">株式の期待リターン（年率）</label>
         <input type="number" step="0.01" value={params.investmentReturnRate} onChange={e => handleChange('investmentReturnRate', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">リスク（標準偏差）</label>
+        <label className="block mb-1 font-bold">株式のリスク（標準偏差）</label>
         <input type="number" step="0.01" value={params.investmentRisk} onChange={e => handleChange('investmentRisk', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">仮想通貨の期待リターン（年率）</label>
+        <input type="number" step="0.01" value={params.cryptoReturnRate} onChange={e => handleChange('cryptoReturnRate', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">仮想通貨のリスク（標準偏差）</label>
+        <input type="number" step="0.01" value={params.cryptoRisk} onChange={e => handleChange('cryptoRisk', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">株売却時のコスト（税金等）</label>
         <input type="number" step="0.01" value={params.stockTaxRate} onChange={e => handleChange('stockTaxRate', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">仮想通貨売却時のコスト（税金等）</label>
@@ -652,6 +664,8 @@ function App() {
     inflationRate: 0.01,
     investmentReturnRate: 0.05,
     investmentRisk: 0.15,
+    cryptoReturnRate: 0.12,
+    cryptoRisk: 0.35,
     stockTaxRate: 1.1,
     cryptoTaxRate: 1.3,
     cashUpperLimit: 20000000,
