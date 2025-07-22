@@ -73,6 +73,12 @@ type YearlyData = {
   p90: number;
   /** 資産額の下位10% */
   p10: number;
+  /** 株式の中央値 */
+  medianStock: number;
+  /** 仮想通貨の中央値 */
+  medianCrypto: number;
+  /** 現金の中央値 */
+  medianCash: number;
 };
 
 // --- Monte Carlo Simulation Logic ---
@@ -108,6 +114,9 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
 
   const simulationPeriod = 100 - initialAge;
   const results: number[][] = [];
+  const stockResults: number[][] = [];
+  const cryptoResults: number[][] = [];
+  const cashResults: number[][] = [];
 
   for (let i = 0; i < numSimulations; i++) {
     let stockValue = initialStockValue;
@@ -121,6 +130,9 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
     let currentRealEstateIncome = realEstateIncome;
 
     const yearlyTotalAssets: number[] = [stockValue + cryptoValue + cashValue];
+    const yearlyStockValues: number[] = [stockValue];
+    const yearlyCryptoValues: number[] = [cryptoValue];
+    const yearlyCashValues: number[] = [cashValue];
 
     for (let year = 1; year <= simulationPeriod; year++) {
       const currentAge = initialAge + year - 1;
@@ -207,6 +219,9 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
 
       const totalAssets = stockValue + cryptoValue + cashValue;
       yearlyTotalAssets.push(totalAssets);
+      yearlyStockValues.push(stockValue);
+      yearlyCryptoValues.push(cryptoValue);
+      yearlyCashValues.push(cashValue);
 
       // Apply inflation for next year
       currentLivingExpenses *= (1 + inflationRate);
@@ -216,13 +231,23 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
       currentRealEstateIncome *= (1 + inflationRate);
     }
     results.push(yearlyTotalAssets);
+    stockResults.push(yearlyStockValues);
+    cryptoResults.push(yearlyCryptoValues);
+    cashResults.push(yearlyCashValues);
   }
 
   // --- Process results for charting ---
   const chartData: YearlyData[] = [];
   for (let year = 0; year <= simulationPeriod; year++) {
     const yearlyOutcomes = results.map(sim => sim[year]);
+    const yearlyStockOutcomes = stockResults.map(sim => sim[year]);
+    const yearlyCryptoOutcomes = cryptoResults.map(sim => sim[year]);
+    const yearlyCashOutcomes = cashResults.map(sim => sim[year]);
+
     yearlyOutcomes.sort((a, b) => a - b);
+    yearlyStockOutcomes.sort((a, b) => a - b);
+    yearlyCryptoOutcomes.sort((a, b) => a - b);
+    yearlyCashOutcomes.sort((a, b) => a - b);
 
     const yearData: YearlyData = {
       year: year,
@@ -230,6 +255,9 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
       median: yearlyOutcomes[Math.floor(numSimulations / 2)],
       p90: yearlyOutcomes[Math.floor(numSimulations * 0.9)],
       p10: yearlyOutcomes[Math.floor(numSimulations * 0.1)],
+      medianStock: yearlyStockOutcomes[Math.floor(numSimulations / 2)],
+      medianCrypto: yearlyCryptoOutcomes[Math.floor(numSimulations / 2)],
+      medianCash: yearlyCashOutcomes[Math.floor(numSimulations / 2)],
     };
     chartData.push(yearData);
   }
@@ -392,6 +420,37 @@ const AssetChart = ({ data }: { data: YearlyData[] }) => {
 };
 
 /**
+ * 資産別推移のグラフコンポーネントです。
+ * @param data グラフに表示するデータ
+ */
+const AssetBreakdownChart = ({ data }: { data: YearlyData[] }) => {
+  /**
+   * Y軸の目盛りを万円単位でフォーマットする関数
+   * @param tick 目盛りの値
+   * @returns フォーマットされた文字列
+   */
+  const formatYAxis = (tick: number) => `${(tick / 1000000).toLocaleString()}`;
+
+  return (
+    <div className="w-full h-[500px] mb-15">
+      <h2 className="text-xl font-bold mb-3">資産別推移（中央値）</h2>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="age" name="年齢" />
+          <YAxis tickFormatter={formatYAxis} />
+          <Tooltip formatter={(value: number) => `${(value / 10000).toLocaleString()}万円`} />
+          <Legend />
+          <Line type="monotone" dataKey="medianCash" stroke="#ff7300" name="現金" dot={false} strokeWidth={2} />
+          <Line type="monotone" dataKey="medianCrypto" stroke="#00c49f" name="仮想通貨" dot={false} strokeWidth={2} />
+          <Line type="monotone" dataKey="medianStock" stroke="#0088fe" name="株式" dot={false} strokeWidth={2} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+/**
  * アプリケーションのメインコンポーネントです。
  */
 function App() {
@@ -482,6 +541,7 @@ function App() {
           {simulationData ? (
             <>
               <AssetChart data={simulationData} />
+              <AssetBreakdownChart data={simulationData} />
               <div className="w-full overflow-x-auto">
                 <h2 className="text-xl font-bold mb-3">シミュレーション結果（5年ごと）</h2>
                 <table className="w-full border-collapse">
