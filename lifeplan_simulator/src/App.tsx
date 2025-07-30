@@ -14,6 +14,8 @@ type SimulationParams = {
   initialAge: number;
   /** 仕事をリタイアする年齢 */
   retirementAge: number;
+  /** シミュレーション終了年齢 */
+  endAge: number;
   /** ローン年数 */
   loanDuration: number;
   /** 年間医療・介護費が発生する年齢 */
@@ -124,7 +126,7 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
     numSimulations,
   } = params;
 
-  const simulationPeriod = 100 - initialAge;
+  const simulationPeriod = params.endAge - initialAge;
   const results: number[][] = [];
   const stockResults: number[][] = [];
   const cryptoResults: number[][] = [];
@@ -392,7 +394,20 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
   const handleChange = (field: keyof SimulationParams, value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
-      setParams({ ...params, [field]: numValue });
+      // 終了年齢の場合は範囲チェック
+      if (field === 'endAge') {
+        const clampedValue = Math.min(Math.max(numValue, params.initialAge + 1), 120);
+        setParams({ ...params, [field]: clampedValue });
+      } else if (field === 'initialAge') {
+        // 初期年齢が変更された場合、終了年齢も調整
+        const newParams = { ...params, [field]: numValue };
+        if (newParams.endAge <= numValue) {
+          newParams.endAge = Math.min(numValue + 1, 120);
+        }
+        setParams(newParams);
+      } else {
+        setParams({ ...params, [field]: numValue });
+      }
     }
   };
 
@@ -505,6 +520,8 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         <h3 className="text-base font-bold mb-3">基本項目</h3>
         <label className="block mb-1 font-bold">初期年齢</label>
         <input type="number" value={params.initialAge} onChange={e => handleChange('initialAge', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">シミュレーション終了年齢（最大120歳）</label>
+        <input type="number" min={params.initialAge + 1} max="120" value={params.endAge} onChange={e => handleChange('endAge', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">インフレ率</label>
         <input type="number" step="0.01" value={params.inflationRate} onChange={e => handleChange('inflationRate', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">株式の期待リターン（年率）</label>
@@ -658,6 +675,7 @@ function App() {
   const [params, setParams] = useState<SimulationParams>({
     initialAge: 30,
     retirementAge: 65,
+    endAge: 100,
     loanDuration: 35,
     medicalCareStartAge: 75,
     entertainmentExpensesDeclineStartAge: 75,
@@ -714,7 +732,7 @@ function App() {
   /**
    * シミュレーション期間
    */
-  const simulationPeriod = useMemo(() => 100 - params.initialAge, [params.initialAge]);
+  const simulationPeriod = useMemo(() => params.endAge - params.initialAge, [params.endAge, params.initialAge]);
 
   /**
    * 5年ごとのシミュレーション結果のサマリーデータ
