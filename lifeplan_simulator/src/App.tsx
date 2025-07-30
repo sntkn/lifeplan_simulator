@@ -83,6 +83,10 @@ type YearlyData = {
   median: number;
   /** 資産額の上位10% */
   p90: number;
+  /** 資産額の上位25% */
+  p75: number;
+  /** 資産額の下位25% */
+  p25: number;
   /** 資産額の下位10% */
   p10: number;
   /** 株式の中央値 */
@@ -270,6 +274,8 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
       age: initialAge + year,
       median: yearlyOutcomes[Math.floor(numSimulations / 2)],
       p90: yearlyOutcomes[Math.floor(numSimulations * 0.9)],
+      p75: yearlyOutcomes[Math.floor(numSimulations * 0.75)],
+      p25: yearlyOutcomes[Math.floor(numSimulations * 0.25)],
       p10: yearlyOutcomes[Math.floor(numSimulations * 0.1)],
       medianStock: yearlyStockOutcomes[Math.floor(numSimulations / 2)],
       medianCrypto: yearlyCryptoOutcomes[Math.floor(numSimulations / 2)],
@@ -625,8 +631,10 @@ const AssetChart = ({ data }: { data: YearlyData[] }) => {
           <YAxis tickFormatter={formatYAxis} />
           <Tooltip formatter={(value: number) => `${(value / 10000).toLocaleString()}万円`} />
           <Legend />
-          <Line type="monotone" dataKey="median" stroke="#8884d8" name="資産額中央値" dot={false} />
+          <Line type="monotone" dataKey="median" stroke="#8884d8" name="資産額中央値" dot={false} strokeWidth={2} />
           <Line type="monotone" dataKey="p90" stroke="#82ca9d" name="上位10%" dot={false} />
+          <Line type="monotone" dataKey="p75" stroke="#a4de6c" name="上位25%" dot={false} strokeDasharray="5 5" />
+          <Line type="monotone" dataKey="p25" stroke="#ffb347" name="下位25%" dot={false} strokeDasharray="5 5" />
           <Line type="monotone" dataKey="p10" stroke="#ffc658" name="下位10%" dot={false} />
         </LineChart>
       </ResponsiveContainer>
@@ -766,8 +774,10 @@ function App() {
                   <thead>
                     <tr>
                       <th className="border p-2 text-right">年齢</th>
-                      <th className="border p-2 text-right">資産額中央値</th>
                       <th className="border p-2 text-right">上位10%</th>
+                      <th className="border p-2 text-right">上位25%</th>
+                      <th className="border p-2 text-right">資産額中央値</th>
+                      <th className="border p-2 text-right">下位25%</th>
                       <th className="border p-2 text-right">下位10%</th>
                     </tr>
                   </thead>
@@ -775,8 +785,10 @@ function App() {
                     {summaryData.map(d => (
                       <tr key={d.year}>
                         <td className="border p-2 text-right">{d.age}歳</td>
-                        <td className="border p-2 text-right">{Math.round(d.median / 10000).toLocaleString()}万円</td>
                         <td className="border p-2 text-right">{Math.round(d.p90 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.round(d.p75 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.round(d.median / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.round(d.p25 / 10000).toLocaleString()}万円</td>
                         <td className="border p-2 text-right">{Math.round(d.p10 / 10000).toLocaleString()}万円</td>
                       </tr>
                     ))}
