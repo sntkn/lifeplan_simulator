@@ -526,7 +526,7 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         <h3 className="text-base font-bold mb-3">基本項目</h3>
         <label className="block mb-1 font-bold">初期年齢</label>
         <input type="number" value={params.initialAge} onChange={e => handleChange('initialAge', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">シミュレーション終了年齢（最大120歳）</label>
+        <label className="block mb-1 font-bold">終了年齢（最大120歳）</label>
         <input type="number" min={params.initialAge + 1} max="120" value={params.endAge} onChange={e => handleChange('endAge', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">インフレ率</label>
         <input type="number" step="0.01" value={params.inflationRate} onChange={e => handleChange('inflationRate', e.target.value)} className="w-full p-2 border rounded box-border" />
@@ -695,9 +695,9 @@ function App() {
     stockTaxRate: 1.1,
     cryptoTaxRate: 1.3,
     cashUpperLimit: 20000000,
-    cashLowerLimit: 5000000,
-    cryptoLowerLimit: 5000000,
-    stockLowerLimit: 5000000,
+    cashLowerLimit: 0,
+    cryptoLowerLimit: 0,
+    stockLowerLimit: 0,
     liquidationPriority: 'crypto',
     initialStockValue: 0,
     initialCryptoValue: 0,
@@ -706,7 +706,7 @@ function App() {
     entertainmentExpenses: 500000,
     housingMaintenance: 600000,
     medicalCare: 750000,
-    housingLoan: 210000,
+    housingLoan: 1800000,
     salary: 3000000,
     realEstateIncome: 0,
     numSimulations: 1000,
