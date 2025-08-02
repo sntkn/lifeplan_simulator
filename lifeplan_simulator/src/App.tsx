@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import './App.css';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { sp500Returns, japanInflationRates, cryptoReturns, getHistoricalStats, validateSimulationPeriod, cryptoDataStartYear } from './historicalData';
+import { sp500Returns, japanInflationRates, cryptoReturns, validateSimulationPeriod } from './historicalData';
 
 // --- Types ---
 type SavedSetting = {
@@ -366,17 +366,6 @@ const runHistoricalSimulation = (params: SimulationParams): YearlyData[] => {
       const stockReturn = sp500Returns[dataIndex] || 0;
       const cryptoReturn = cryptoReturns[dataIndex] || 0;
       const inflationRate = japanInflationRates[dataIndex] || 0.02;
-
-      // デバッグ用ログ（最初の数年のみ）
-      if (startYear === 0 && year <= 3) {
-        console.log(`Year ${year}, dataIndex ${dataIndex}:`, { stockReturn, cryptoReturn, inflationRate });
-      }
-
-      // NaNチェック
-      if (isNaN(stockReturn) || isNaN(cryptoReturn) || isNaN(inflationRate)) {
-        console.error('Invalid data at index', dataIndex, { stockReturn, cryptoReturn, inflationRate });
-        continue;
-      }
 
       stockValue *= (1 + stockReturn);
       cryptoValue *= (1 + cryptoReturn);
