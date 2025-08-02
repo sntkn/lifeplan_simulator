@@ -39,19 +39,13 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
     if (!isNaN(numValue)) {
       // 終了年齢の場合は範囲チェック
       if (field === 'endAge') {
-        let maxAge = 120;
-        if (params.simulationMethod === 'historical') {
-          maxAge = Math.min(120, params.initialAge + 30);
-        }
+        const maxAge = 120; // 全ての方法で120歳まで対応
         const clampedValue = Math.min(Math.max(numValue, params.initialAge + 1), maxAge);
         setParams({ ...params, [field]: clampedValue });
       } else if (field === 'initialAge') {
         // 初期年齢が変更された場合、終了年齢も調整
         const newParams = { ...params, [field]: numValue };
-        let maxAge = 120;
-        if (params.simulationMethod === 'historical') {
-          maxAge = Math.min(120, numValue + 30);
-        }
+        const maxAge = 120;
         if (newParams.endAge <= numValue || newParams.endAge > maxAge) {
           newParams.endAge = Math.min(numValue + 1, maxAge);
         }
@@ -76,17 +70,7 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
           value={params.simulationMethod}
           onChange={e => {
             const newMethod = e.target.value as 'montecarlo' | 'historical';
-            const newParams = { ...params, simulationMethod: newMethod };
-
-            // ヒストリカル法に変更した場合、終了年齢を制限
-            if (newMethod === 'historical') {
-              const maxAge = Math.min(120, params.initialAge + 30);
-              if (params.endAge > maxAge) {
-                newParams.endAge = maxAge;
-              }
-            }
-
-            setParams(newParams);
+            setParams({ ...params, simulationMethod: newMethod });
           }}
           className="w-full p-2 border rounded box-border mb-3"
         >
@@ -116,7 +100,7 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
               <p>• 複数の開始年でシミュレーション実行</p>
               <p>• 実際の市場変動パターンを再現</p>
               <p>• 仮想通貨：2014年以前は株式リターンを適用</p>
-              <p className="text-orange-600 dark:text-orange-400 font-bold">※ 最大30年間のシミュレーション</p>
+              <p className="text-blue-600 dark:text-blue-400 font-bold">※ 30年超の場合は循環データを使用</p>
             </div>
 
             <label className="block mb-1 font-bold">株式リターンの地域</label>
@@ -156,14 +140,14 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
         <input
           type="number"
           min={params.initialAge + 1}
-          max={params.simulationMethod === 'historical' ? Math.min(120, params.initialAge + 30) : 120}
+          max={120}
           value={params.endAge}
           onChange={e => handleChange('endAge', e.target.value)}
           className="w-full p-2 border rounded box-border"
         />
-        {params.simulationMethod === 'historical' && (
-          <div className="mt-1 text-sm text-orange-600 dark:text-orange-400">
-            ヒストリカル法では最大30年間のシミュレーションが可能です
+        {params.simulationMethod === 'historical' && (params.endAge - params.initialAge) > 30 && (
+          <div className="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            30年を超える期間では、ヒストリカルデータを循環使用します
           </div>
         )}
 

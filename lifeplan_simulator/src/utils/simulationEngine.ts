@@ -5,19 +5,23 @@ import {
   getInflationData,
   getStockData,
   HISTORICAL_DATA_LENGTH,
-  MAX_START_YEARS,
-  MIN_START_YEARS
+  MAX_START_YEARS
 } from '../historicalData';
 
 // --- Simulation Configuration ---
 /**
  * ヒストリカルシミュレーションの実行回数を計算します
+ * 30年を超える場合でも循環データを使用して複数パターンを確保
  */
 const calculateHistoricalSimulationCount = (simulationPeriod: number): number => {
-  const maxStartYears = Math.min(MAX_START_YEARS, HISTORICAL_DATA_LENGTH);
-  return simulationPeriod <= HISTORICAL_DATA_LENGTH
-    ? maxStartYears
-    : Math.min(MIN_START_YEARS, HISTORICAL_DATA_LENGTH);
+  if (simulationPeriod <= HISTORICAL_DATA_LENGTH) {
+    // 30年以内の場合：独立したパターンの最大数を計算
+    const maxIndependentPatterns = Math.max(1, HISTORICAL_DATA_LENGTH - simulationPeriod + 1);
+    return Math.min(MAX_START_YEARS, maxIndependentPatterns);
+  } else {
+    // 30年を超える場合：循環データを使用して常に10パターンを確保
+    return MAX_START_YEARS;
+  }
 };
 
 // --- Return Calculation Strategies ---
@@ -67,6 +71,7 @@ class HistoricalReturnCalculator implements ReturnCalculator {
     cryptoReturn: number;
     inflationRate: number;
   } {
+    // 循環データインデックスの計算（30年を超える場合でも対応）
     const dataIndex = (startYear + yearIndex - 1) % HISTORICAL_DATA_LENGTH;
     const stockData = getStockData(this.stockRegion);
     const inflationData = getInflationData(this.inflationRegion);
@@ -74,6 +79,11 @@ class HistoricalReturnCalculator implements ReturnCalculator {
     const stockReturn = stockData[dataIndex] || 0;
     const cryptoReturn = cryptoReturns[dataIndex] || 0;
     const inflationRate = inflationData[dataIndex] || 0.02;
+
+    // デバッグ情報（長期シミュレーション時）
+    if (yearIndex === 1 && startYear < 3) {
+      console.log(`Pattern ${startYear + 1}: Starting from year ${1994 + startYear}, dataIndex: ${dataIndex}`);
+    }
 
     // NaNチェック
     if (isNaN(stockReturn) || isNaN(cryptoReturn) || isNaN(inflationRate)) {
@@ -377,6 +387,7 @@ export const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] 
 
 /**
  * ヒストリカルシミュレーションを実行します。
+ * 30年を超える場合でも循環データを使用して複数パターンを実行
  * @param params シミュレーションのパラメータ
  * @returns シミュレーション結果の配列
  */
@@ -391,6 +402,11 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
     return [];
   }
 
+  // 循環データ使用の警告表示
+  if (validation.message) {
+    console.warn(validation.message);
+  }
+
   const returnCalculator = new HistoricalReturnCalculator(
     params.stockRegion || 'sp500',
     params.inflationRegion || 'japan'
@@ -398,7 +414,10 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
   const simulationPeriod = params.endAge - params.initialAge;
   const actualStartYears = calculateHistoricalSimulationCount(simulationPeriod);
 
-  console.log('Running', actualStartYears, 'simulations');
+  console.log(`Running ${actualStartYears} simulations for ${simulationPeriod} years`);
+  if (simulationPeriod > HISTORICAL_DATA_LENGTH) {
+    console.log(`Using cyclic historical data (${HISTORICAL_DATA_LENGTH} years repeated)`);
+  }
 
   const allSimulations: number[][] = [];
   const allStockSimulations: number[][] = [];

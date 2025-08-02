@@ -247,8 +247,8 @@ export const historicalYears = Array.from({ length: 30 }, (_, i) => 1994 + i);
 
 // ヒストリカルデータの期間定数
 export const HISTORICAL_DATA_LENGTH = historicalYears.length; // 30年間
-export const MAX_START_YEARS = 10; // 最大開始年パターン数
-export const MIN_START_YEARS = 5; // 最小開始年パターン数
+export const MAX_START_YEARS = 30; // 最大開始年パターン数（全ヒストリカルデータを活用）
+export const OPTIMAL_PATTERN_COUNT = 30; // 推奨パターン数（統計的精度を最大化）
 
 // データ選択用の型
 export type InflationRegion = 'japan' | 'us' | 'world';
@@ -287,22 +287,27 @@ export const inflationOptions = [
   { value: 'world' as InflationRegion, label: '世界平均' }
 ];
 
-// シミュレーション期間の制限チェック
+// シミュレーション期間の制限チェック（循環データ対応）
 export const validateSimulationPeriod = (startAge: number, endAge: number) => {
   const simulationPeriod = endAge - startAge;
-  const maxPeriod = historicalYears.length;
 
-  if (simulationPeriod > maxPeriod) {
+  // 30年を超える場合でも循環データを使用するため制限を緩和
+  // ただし、あまりに長期間（例：100年以上）は現実的でないため上限を設定
+  const maxReasonablePeriod = 100;
+
+  if (simulationPeriod > maxReasonablePeriod) {
     return {
       isValid: false,
-      maxEndAge: startAge + maxPeriod,
-      message: `ヒストリカル法では最大${maxPeriod}年間のシミュレーションが可能です。終了年齢を${startAge + maxPeriod}歳以下に設定してください。`
+      maxEndAge: startAge + maxReasonablePeriod,
+      message: `シミュレーション期間は最大${maxReasonablePeriod}年間です。終了年齢を${startAge + maxReasonablePeriod}歳以下に設定してください。`
     };
   }
 
   return {
     isValid: true,
     maxEndAge: endAge,
-    message: ''
+    message: simulationPeriod > historicalYears.length
+      ? `${simulationPeriod}年間のシミュレーションでは、30年分のヒストリカルデータを循環使用します。`
+      : ''
   };
 };
