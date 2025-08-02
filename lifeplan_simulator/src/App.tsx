@@ -4,6 +4,7 @@ import { AssetChart } from './components/charts/AssetChart';
 import { AssetBreakdownChart } from './components/charts/AssetBreakdownChart';
 import { ResultsTable } from './components/results/ResultsTable';
 import { InputPanel } from './components/forms/InputPanel';
+import { AIAdvisorPanel } from './components/ai/AIAdvisorPanel';
 import { useSimulation } from './hooks/useSimulation';
 
 /**
@@ -38,12 +39,13 @@ function App() {
       <h1 className="text-3xl font-bold mb-5">老後資産推移モンテカルロシミュレーター</h1>
       <div className="flex w-full max-w-7xl gap-5">
         <InputPanel params={params} setParams={setParams} onSimulate={runSimulation} />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col gap-5">
           {simulationData ? (
             <>
               <AssetChart data={simulationData} />
               <AssetBreakdownChart data={simulationData} />
               <ResultsTable data={simulationData} simulationPeriod={simulationPeriod} />
+              <AIAdvisorPanel params={params} simulationData={simulationData} />
             </>
           ) : (
             <div className="w-full h-[500px] mb-5 flex items-center justify-center">
