@@ -245,6 +245,11 @@ export const cryptoReturns = [
 
 export const historicalYears = Array.from({ length: 30 }, (_, i) => 1994 + i);
 
+// ヒストリカルデータの期間定数
+export const HISTORICAL_DATA_LENGTH = historicalYears.length; // 30年間
+export const MAX_START_YEARS = 10; // 最大開始年パターン数
+export const MIN_START_YEARS = 5; // 最小開始年パターン数
+
 // データ選択用の型
 export type InflationRegion = 'japan' | 'us' | 'world';
 export type StockRegion = 'sp500' | 'nikkei' | 'world';

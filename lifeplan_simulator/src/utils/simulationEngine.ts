@@ -1,5 +1,24 @@
 import type { SimulationParams, YearlyData } from '../types/simulation';
-import { cryptoReturns, validateSimulationPeriod, getInflationData, getStockData } from '../historicalData';
+import {
+  cryptoReturns,
+  validateSimulationPeriod,
+  getInflationData,
+  getStockData,
+  HISTORICAL_DATA_LENGTH,
+  MAX_START_YEARS,
+  MIN_START_YEARS
+} from '../historicalData';
+
+// --- Simulation Configuration ---
+/**
+ * ヒストリカルシミュレーションの実行回数を計算します
+ */
+const calculateHistoricalSimulationCount = (simulationPeriod: number): number => {
+  const maxStartYears = Math.min(MAX_START_YEARS, HISTORICAL_DATA_LENGTH);
+  return simulationPeriod <= HISTORICAL_DATA_LENGTH
+    ? maxStartYears
+    : Math.min(MIN_START_YEARS, HISTORICAL_DATA_LENGTH);
+};
 
 // --- Return Calculation Strategies ---
 interface ReturnCalculator {
@@ -38,8 +57,6 @@ class MonteCarloReturnCalculator implements ReturnCalculator {
 }
 
 class HistoricalReturnCalculator implements ReturnCalculator {
-  private historicalDataLength = 30; // 1994-2023年の30年間
-
   constructor(
     private stockRegion: 'sp500' | 'nikkei' | 'world',
     private inflationRegion: 'japan' | 'us' | 'world'
@@ -50,7 +67,7 @@ class HistoricalReturnCalculator implements ReturnCalculator {
     cryptoReturn: number;
     inflationRate: number;
   } {
-    const dataIndex = (startYear + yearIndex - 1) % this.historicalDataLength;
+    const dataIndex = (startYear + yearIndex - 1) % HISTORICAL_DATA_LENGTH;
     const stockData = getStockData(this.stockRegion);
     const inflationData = getInflationData(this.inflationRegion);
 
@@ -324,11 +341,7 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
     params.inflationRegion || 'japan'
   );
   const simulationPeriod = params.endAge - params.initialAge;
-  const historicalDataLength = 30; // 1994-2023年の30年間
-
-  // 複数の開始年でシミュレーションを実行（最大10パターン）
-  const maxStartYears = Math.min(10, historicalDataLength);
-  const actualStartYears = simulationPeriod <= historicalDataLength ? maxStartYears : Math.min(5, historicalDataLength);
+  const actualStartYears = calculateHistoricalSimulationCount(simulationPeriod);
 
   console.log('Running', actualStartYears, 'simulations');
 
