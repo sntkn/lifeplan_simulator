@@ -934,7 +934,7 @@ const AssetChart = ({ data }: { data: YearlyData[] }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="age" name="年齢" />
           <YAxis tickFormatter={formatYAxis} />
-          <Tooltip formatter={(value: number) => `${(value / 10000).toLocaleString()}万円`} />
+          <Tooltip formatter={(value: number) => `${Math.floor(value / 10000).toLocaleString()}万円`} />
           <Legend />
           <Line type="monotone" dataKey="median" stroke="#8884d8" name="資産額中央値" dot={false} strokeWidth={2} />
           <Line type="monotone" dataKey="p90" stroke="#82ca9d" name="上位10%" dot={false} />
@@ -967,7 +967,7 @@ const AssetBreakdownChart = ({ data }: { data: YearlyData[] }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="age" name="年齢" />
           <YAxis tickFormatter={formatYAxis} />
-          <Tooltip formatter={(value: number) => `${(value / 10000).toLocaleString()}万円`} />
+          <Tooltip formatter={(value: number) => `${Math.floor(value / 10000).toLocaleString()}万円`} />
           <Legend />
           <Line type="monotone" dataKey="medianCash" stroke="#ff7300" name="現金" dot={false} strokeWidth={2} />
           <Line type="monotone" dataKey="medianCrypto" stroke="#00c49f" name="仮想通貨" dot={false} strokeWidth={2} />
@@ -1093,11 +1093,11 @@ function App() {
                     {summaryData.map(d => (
                       <tr key={d.year}>
                         <td className="border p-2 text-right">{d.age}歳</td>
-                        <td className="border p-2 text-right">{Math.round(d.p90 / 10000).toLocaleString()}万円</td>
-                        <td className="border p-2 text-right">{Math.round(d.p75 / 10000).toLocaleString()}万円</td>
-                        <td className="border p-2 text-right">{Math.round(d.median / 10000).toLocaleString()}万円</td>
-                        <td className="border p-2 text-right">{Math.round(d.p25 / 10000).toLocaleString()}万円</td>
-                        <td className="border p-2 text-right">{Math.round(d.p10 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.floor(d.p90 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.floor(d.p75 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.floor(d.median / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.floor(d.p25 / 10000).toLocaleString()}万円</td>
+                        <td className="border p-2 text-right">{Math.floor(d.p10 / 10000).toLocaleString()}万円</td>
                       </tr>
                     ))}
                   </tbody>
