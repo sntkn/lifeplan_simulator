@@ -162,10 +162,36 @@ const runSingleSimulation = (
     // Cash upper limit handling
     if (cashValue > cashUpperLimit) {
       const surplus = cashValue - cashUpperLimit;
-      if (params.liquidationPriority === 'crypto') {
-        cryptoValue += surplus;
-      } else {
-        stockValue += surplus;
+
+      switch (params.liquidationPriority) {
+        case 'crypto':
+          cryptoValue += surplus;
+          break;
+        case 'stock':
+          stockValue += surplus;
+          break;
+        default: // random
+          const stockAboveLowerLimit = stockValue >= stockLowerLimit;
+          const cryptoAboveLowerLimit = cryptoValue >= cryptoLowerLimit;
+
+          if (stockAboveLowerLimit && cryptoAboveLowerLimit) {
+            // 両方が下限以上の場合、ランダムで選択
+            if (Math.random() < 0.5) {
+              cryptoValue += surplus;
+            } else {
+              stockValue += surplus;
+            }
+          } else if (stockAboveLowerLimit) {
+            // 株式のみが下限以上の場合
+            stockValue += surplus;
+          } else if (cryptoAboveLowerLimit) {
+            // 仮想通貨のみが下限以上の場合
+            cryptoValue += surplus;
+          } else {
+            // 両方とも下限を下回っている場合、デフォルトで株式に追加
+            stockValue += surplus;
+          }
+          break;
       }
       cashValue = cashUpperLimit;
     }
@@ -195,12 +221,37 @@ const runSingleSimulation = (
         }
       };
 
-      if (params.liquidationPriority === 'crypto') {
-        liquidate('crypto');
-        liquidate('stock');
-      } else {
-        liquidate('stock');
-        liquidate('crypto');
+      switch (params.liquidationPriority) {
+        case 'crypto':
+          liquidate('crypto');
+          liquidate('stock');
+          break;
+        case 'stock':
+          liquidate('stock');
+          liquidate('crypto');
+          break;
+        default: // random
+          const stockAboveLowerLimit = stockValue > stockLowerLimit;
+          const cryptoAboveLowerLimit = cryptoValue > cryptoLowerLimit;
+
+          if (stockAboveLowerLimit && cryptoAboveLowerLimit) {
+            // 両方が下限以上の場合、ランダムで優先順位を決定
+            if (Math.random() < 0.5) {
+              liquidate('crypto');
+              liquidate('stock');
+            } else {
+              liquidate('stock');
+              liquidate('crypto');
+            }
+          } else if (stockAboveLowerLimit) {
+            // 株式のみが下限以上の場合
+            liquidate('stock');
+          } else if (cryptoAboveLowerLimit) {
+            // 仮想通貨のみが下限以上の場合
+            liquidate('crypto');
+          }
+          // 両方とも下限以下の場合は何もしない
+          break;
       }
     }
 

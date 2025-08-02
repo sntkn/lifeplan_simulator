@@ -195,9 +195,10 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
         <label className="block mb-1 font-bold">株保有額の下限（万円）</label>
         <input type="number" value={params.stockLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('stockLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">現金不足時の優先取り崩し資産</label>
-        <select value={params.liquidationPriority} onChange={e => setParams({ ...params, liquidationPriority: e.target.value as 'crypto' | 'stock' })} className="w-full p-2 border rounded box-border">
+        <select value={params.liquidationPriority} onChange={e => setParams({ ...params, liquidationPriority: e.target.value as 'crypto' | 'stock' | 'random' })} className="w-full p-2 border rounded box-border">
           <option value="crypto">仮想通貨</option>
           <option value="stock">株式</option>
+          <option value="random">ランダム</option>
         </select>
         <label className="block mb-1 font-bold">仕事をリタイアする年齢</label>
         <input type="number" value={params.retirementAge} onChange={e => handleChange('retirementAge', e.target.value)} className="w-full p-2 border rounded box-border" />
