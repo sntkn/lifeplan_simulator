@@ -162,7 +162,11 @@ const runSingleSimulation = (
     // Cash upper limit handling
     if (cashValue > cashUpperLimit) {
       const surplus = cashValue - cashUpperLimit;
-      stockValue += surplus;
+      if (params.liquidationPriority === 'crypto') {
+        cryptoValue += surplus;
+      } else {
+        stockValue += surplus;
+      }
       cashValue = cashUpperLimit;
     }
 
