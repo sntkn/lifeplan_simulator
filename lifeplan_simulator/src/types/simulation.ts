@@ -19,6 +19,8 @@ export type SimulationParams = {
   medicalCareStartAge: number;
   /** 娯楽費が減少し始める年齢 */
   entertainmentExpensesDeclineStartAge: number;
+  /** 娯楽費の年間減少率（0.1 = 10%減少） */
+  entertainmentExpensesDeclineRate: number;
   /** インフレ率 */
   inflationRate: number;
   /** 株式の期待リターン（年率） */

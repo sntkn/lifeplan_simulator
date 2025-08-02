@@ -146,7 +146,7 @@ const runSingleSimulation = (
 
     // Expenses calculation
     if (currentAge >= params.entertainmentExpensesDeclineStartAge) {
-      currentEntertainmentExpenses *= 0.9;
+      currentEntertainmentExpenses *= (1 - params.entertainmentExpensesDeclineRate);
     }
     const expenses =
       currentLivingExpenses +

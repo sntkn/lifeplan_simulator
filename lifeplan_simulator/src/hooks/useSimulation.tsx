@@ -16,6 +16,7 @@ export const useSimulation = () => {
     loanDuration: 30,
     medicalCareStartAge: 75,
     entertainmentExpensesDeclineStartAge: 75,
+    entertainmentExpensesDeclineRate: 0.1,
     inflationRate: 0.01,
     investmentReturnRate: 0.05,
     investmentRisk: 0.15,

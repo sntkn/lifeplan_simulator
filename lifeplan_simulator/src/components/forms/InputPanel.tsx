@@ -207,6 +207,8 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
         <input type="number" value={params.medicalCareStartAge} onChange={e => handleChange('medicalCareStartAge', e.target.value)} className="w-full p-2 border rounded box-border" />
         <label className="block mb-1 font-bold">娯楽費が減少し始める年齢</label>
         <input type="number" value={params.entertainmentExpensesDeclineStartAge} onChange={e => handleChange('entertainmentExpensesDeclineStartAge', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <label className="block mb-1 font-bold">娯楽費の年間減少率（0.1 = 10%減少）</label>
+        <input type="number" step="0.01" min="0" max="1" value={params.entertainmentExpensesDeclineRate} onChange={e => handleChange('entertainmentExpensesDeclineRate', e.target.value)} className="w-full p-2 border rounded box-border" />
       </div>
 
       <div className="mb-5">
