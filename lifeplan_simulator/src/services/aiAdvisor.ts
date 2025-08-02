@@ -39,6 +39,7 @@ export class AIAdvisorService {
     results: YearlyData[]
   ): Promise<AIAdvice> {
     const prompt = this.buildAnalysisPrompt(params, results);
+    console.log(prompt);
 
     switch (this.config.provider) {
       case 'ollama':
@@ -60,15 +61,54 @@ export class AIAdvisorService {
   private buildAnalysisPrompt(params: SimulationParams, results: YearlyData[]): string {
     const finalResult = results[results.length - 1];
     const midResult = results[Math.floor(results.length / 2)];
+    const initialResult = results[0];
+
+    // シミュレーション方法の表示名
+    const simulationMethodName = params.simulationMethod === 'montecarlo' ? 'モンテカルロ法' : 'ヒストリカル法';
+
+    // 地域名の表示
+    const getRegionName = (region: string) => {
+      switch (region) {
+        case 'japan': return '日本';
+        case 'us': return '米国';
+        case 'world': return '世界';
+        case 'sp500': return 'S&P500';
+        case 'nikkei': return '日経平均';
+        default: return region;
+      }
+    };
+
+    // シミュレーション設定の表示内容を条件分岐
+    let simulationSettings = '';
+    if (params.simulationMethod === 'montecarlo') {
+      simulationSettings = `
+【シミュレーション設定】
+- シミュレーション方法: ${simulationMethodName}
+- 実行回数: ${params.numSimulations}回
+- インフレ率: ${(params.inflationRate * 100).toFixed(1)}%
+- 株式期待リターン: ${(params.investmentReturnRate * 100).toFixed(1)}%
+- 仮想通貨期待リターン: ${(params.cryptoReturnRate * 100).toFixed(1)}%`;
+    } else {
+      simulationSettings = `
+【シミュレーション設定】
+- シミュレーション方法: ${simulationMethodName}
+- インフレ率地域: ${getRegionName(params.inflationRegion)}の過去データを使用
+- 株式リターン地域: ${getRegionName(params.stockRegion)}の過去データを使用
+- 実行回数: ${params.numSimulations}回（モンテカルロ法に基づく）`;
+    }
 
     return `
 あなたは経験豊富な日本のファイナンシャルプランナーです。以下のライフプランシミュレーション結果を分析し、日本語で具体的で実用的なアドバイスを提供してください。
+
+${simulationSettings}
 
 【基本情報】
 - 現在年齢: ${params.initialAge}歳
 - 退職年齢: ${params.retirementAge}歳
 - シミュレーション終了年齢: ${params.endAge}歳
 - 初期資産: ${Math.round((params.initialStockValue + params.initialCryptoValue + params.initialCashValue) / 10000)}万円
+- ${params.entertainmentExpensesDeclineStartAge}歳以上は年間${(params.entertainmentExpensesDeclineRate * 100).toFixed(1)}%で年間娯楽費が減少
+- ※年金は考慮していません
 
 【収支情報】
 - 年収: ${Math.round(params.salary / 10000)}万円
@@ -77,17 +117,37 @@ export class AIAdvisorService {
 - 年間住宅維持費: ${Math.round(params.housingMaintenance / 10000)}万円
 - 年間医療・介護費: ${Math.round(params.medicalCare / 10000)}万円
 
-【資産配分】
+【資産配分の推移】
+■初期時点（${initialResult.age}歳）
 - 株式: ${Math.round(params.initialStockValue / 10000)}万円
 - 仮想通貨: ${Math.round(params.initialCryptoValue / 10000)}万円
 - 現金: ${Math.round(params.initialCashValue / 10000)}万円
 
-【シミュレーション結果】
-- ${midResult.age}歳時点の資産中央値: ${Math.round(midResult.median / 10000)}万円
-- ${finalResult.age}歳時点の資産中央値: ${Math.round(finalResult.median / 10000)}万円
+■中間時点（${midResult.age}歳）
+- 株式: ${Math.round(midResult.medianStock / 10000)}万円
+- 仮想通貨: ${Math.round(midResult.medianCrypto / 10000)}万円
+- 現金: ${Math.round(midResult.medianCash / 10000)}万円
+
+■最終時点（${finalResult.age}歳）
+- 株式: ${Math.round(finalResult.medianStock / 10000)}万円
+- 仮想通貨: ${Math.round(finalResult.medianCrypto / 10000)}万円
+- 現金: ${Math.round(finalResult.medianCash / 10000)}万円
+
+【シミュレーション結果（3パターン）】
+■最高パターン（90%タイル値）
+- ${midResult.age}歳時点: ${Math.round(midResult.p90 / 10000)}万円
+- ${finalResult.age}歳時点: ${Math.round(finalResult.p90 / 10000)}万円
+
+■中央値パターン（50%タイル値）
+- ${midResult.age}歳時点: ${Math.round(midResult.median / 10000)}万円
+- ${finalResult.age}歳時点: ${Math.round(finalResult.median / 10000)}万円
+
+■最低パターン（10%タイル値）
+- ${midResult.age}歳時点: ${Math.round(midResult.p10 / 10000)}万円
+- ${finalResult.age}歳時点: ${Math.round(finalResult.p10 / 10000)}万円
+
+【リスク評価】
 - 最終時点での資産枯渇リスク: ${finalResult.p10 <= 0 ? '高リスク' : finalResult.p25 <= 0 ? '中リスク' : '低リスク'}
-- 10%タイル値: ${Math.round(finalResult.p10 / 10000)}万円
-- 90%タイル値: ${Math.round(finalResult.p90 / 10000)}万円
 
 【分析指針】
 - 日本の税制、社会保障制度を考慮してください
@@ -97,7 +157,7 @@ export class AIAdvisorService {
 
 必ず以下のJSON形式で日本語で回答してください：
 {
-  "summary": "このライフプランの全体的な評価を100文字以内で簡潔に",
+  "summary": "このライフプランの全体的な評価を400文字以内で簡潔に",
   "risks": [
     "具体的なリスク要因1（例：インフレによる購買力低下）",
     "具体的なリスク要因2（例：医療費の急激な増加）",
