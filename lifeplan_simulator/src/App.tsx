@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import './App.css';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { sp500Returns, japanInflationRates, cryptoReturns, validateSimulationPeriod } from './historicalData';
+import { cryptoReturns, validateSimulationPeriod, getInflationData, getStockData, stockOptions, inflationOptions, type InflationRegion, type StockRegion } from './historicalData';
 
 // --- Types ---
 type SavedSetting = {
@@ -75,6 +75,10 @@ type SimulationParams = {
   numSimulations: number;
   /** シミュレーション方法 */
   simulationMethod: 'montecarlo' | 'historical';
+  /** インフレ率の地域選択（ヒストリカル法用） */
+  inflationRegion: 'japan' | 'us' | 'world';
+  /** 株式リターンの地域選択（ヒストリカル法用） */
+  stockRegion: 'sp500' | 'nikkei' | 'world';
 };
 
 type YearlyData = {
@@ -297,7 +301,7 @@ const runMonteCarloSimulation = (params: SimulationParams): YearlyData[] => {
  */
 const runHistoricalSimulation = (params: SimulationParams): YearlyData[] => {
   console.log('Starting historical simulation with params:', params);
-  console.log('Historical data lengths:', { sp500: sp500Returns.length, inflation: japanInflationRates.length, crypto: cryptoReturns.length });
+  console.log('Historical data lengths:', { crypto: cryptoReturns.length });
 
   // シミュレーション期間のバリデーション
   const validation = validateSimulationPeriod(params.initialAge, params.endAge);
@@ -328,7 +332,7 @@ const runHistoricalSimulation = (params: SimulationParams): YearlyData[] => {
   } = params;
 
   const simulationPeriod = params.endAge - initialAge;
-  const historicalDataLength = sp500Returns.length;
+  const historicalDataLength = 30; // 1994-2023年の30年間
 
   console.log('Simulation period:', simulationPeriod, 'Historical data length:', historicalDataLength);
 
@@ -362,10 +366,13 @@ const runHistoricalSimulation = (params: SimulationParams): YearlyData[] => {
       const currentAge = initialAge + year - 1;
       const dataIndex = (startYear + year - 1) % historicalDataLength;
 
-      // 過去データを使用してリターンを適用
-      const stockReturn = sp500Returns[dataIndex] || 0;
+      // 過去データを使用してリターンを適用（選択された地域のデータを使用）
+      const stockData = getStockData(params.stockRegion);
+      const inflationData = getInflationData(params.inflationRegion);
+
+      const stockReturn = stockData[dataIndex] || 0;
       const cryptoReturn = cryptoReturns[dataIndex] || 0;
-      const inflationRate = japanInflationRates[dataIndex] || 0.02;
+      const inflationRate = inflationData[dataIndex] || 0.02;
 
       stockValue *= (1 + stockReturn);
       cryptoValue *= (1 + cryptoReturn);
@@ -790,15 +797,42 @@ const InputPanel = ({ params, setParams, onSimulate }: { params: SimulationParam
         )}
 
         {params.simulationMethod === 'historical' && (
-          <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded text-sm">
-            <p className="font-bold mb-2">ヒストリカル法について：</p>
-            <p>• S&P500の過去30年データを使用（1994-2023年）</p>
-            <p>• 日本のインフレ率も過去データを適用</p>
-            <p>• 複数の開始年でシミュレーション実行</p>
-            <p>• 実際の市場変動パターンを再現</p>
-            <p>• 仮想通貨：2014年以前は株式リターンを適用</p>
-            <p className="text-orange-600 dark:text-orange-400 font-bold">※ 最大30年間のシミュレーション</p>
-          </div>
+          <>
+            <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded text-sm mb-3">
+              <p className="font-bold mb-2">ヒストリカル法について：</p>
+              <p>• 過去30年データを使用（1994-2023年）</p>
+              <p>• 複数の開始年でシミュレーション実行</p>
+              <p>• 実際の市場変動パターンを再現</p>
+              <p>• 仮想通貨：2014年以前は株式リターンを適用</p>
+              <p className="text-orange-600 dark:text-orange-400 font-bold">※ 最大30年間のシミュレーション</p>
+            </div>
+
+            <label className="block mb-1 font-bold">株式リターンの地域</label>
+            <select
+              value={params.stockRegion}
+              onChange={e => setParams({ ...params, stockRegion: e.target.value as StockRegion })}
+              className="w-full p-2 border rounded box-border mb-3"
+            >
+              {stockOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            <label className="block mb-1 font-bold">インフレ率の地域</label>
+            <select
+              value={params.inflationRegion}
+              onChange={e => setParams({ ...params, inflationRegion: e.target.value as InflationRegion })}
+              className="w-full p-2 border rounded box-border"
+            >
+              {inflationOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </>
         )}
       </div>
 
@@ -1005,6 +1039,8 @@ function App() {
     realEstateIncome: 0,
     numSimulations: 1000,
     simulationMethod: 'montecarlo',
+    inflationRegion: 'japan',
+    stockRegion: 'sp500',
   });
 
   /**

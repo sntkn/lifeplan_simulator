@@ -33,6 +33,76 @@ export const sp500Returns = [
   0.2626,  // 2023
 ];
 
+// 日経平均の年次リターン率（1994-2023年の30年間）
+// 配当込みの実質リターン
+export const nikkeiReturns = [
+  0.1323,  // 1994
+  0.0037,  // 1995
+  -0.0326, // 1996
+  -0.2138, // 1997
+  -0.0954, // 1998
+  0.3677,  // 1999
+  -0.2741, // 2000
+  -0.2384, // 2001
+  -0.1888, // 2002
+  0.2441,  // 2003
+  0.0727,  // 2004
+  0.4005,  // 2005
+  0.0069,  // 2006
+  -0.1125, // 2007
+  -0.4219, // 2008
+  0.1905,  // 2009
+  -0.0300, // 2010
+  -0.1703, // 2011
+  0.2288,  // 2012
+  0.5651,  // 2013
+  -0.0891, // 2014
+  0.0915,  // 2015
+  0.0019,  // 2016
+  0.1940,  // 2017
+  -0.1201, // 2018
+  0.1818,  // 2019
+  0.1607,  // 2020
+  0.0478,  // 2021
+  -0.0931, // 2022
+  0.2836,  // 2023
+];
+
+// 全世界株式の年次リターン率（MSCI ACWI、1994-2023年の30年間）
+// 配当込みの実質リターン（USD建て）
+export const worldStockReturns = [
+  0.0580,  // 1994
+  0.2106,  // 1995
+  0.1398,  // 1996
+  0.1607,  // 1997
+  0.2486,  // 1998
+  0.2534,  // 1999
+  -0.1298, // 2000
+  -0.1649, // 2001
+  -0.1946, // 2002
+  0.3386,  // 2003
+  0.1506,  // 2004
+  0.1006,  // 2005
+  0.2034,  // 2006
+  0.1117,  // 2007
+  -0.4196, // 2008
+  0.3486,  // 2009
+  0.1267,  // 2010
+  -0.0711, // 2011
+  0.1598,  // 2012
+  0.2270,  // 2013
+  0.0411,  // 2014
+  -0.0236, // 2015
+  0.0754,  // 2016
+  0.2398,  // 2017
+  -0.0942, // 2018
+  0.2665,  // 2019
+  0.1640,  // 2020
+  0.1854,  // 2021
+  -0.1813, // 2022
+  0.2207,  // 2023
+];
+
 // 日本のインフレ率（消費者物価指数の前年比、1994-2023年）
 export const japanInflationRates = [
   0.007,   // 1994
@@ -65,6 +135,74 @@ export const japanInflationRates = [
   -0.002,  // 2021
   0.024,   // 2022
   0.032,   // 2023
+];
+
+// アメリカのインフレ率（CPI前年比、1994-2023年）
+export const usInflationRates = [
+  0.026,   // 1994
+  0.028,   // 1995
+  0.030,   // 1996
+  0.023,   // 1997
+  0.016,   // 1998
+  0.022,   // 1999
+  0.034,   // 2000
+  0.028,   // 2001
+  0.016,   // 2002
+  0.023,   // 2003
+  0.027,   // 2004
+  0.034,   // 2005
+  0.032,   // 2006
+  0.029,   // 2007
+  0.038,   // 2008
+  -0.004,  // 2009
+  0.016,   // 2010
+  0.031,   // 2011
+  0.021,   // 2012
+  0.015,   // 2013
+  0.001,   // 2014
+  0.001,   // 2015
+  0.013,   // 2016
+  0.021,   // 2017
+  0.024,   // 2018
+  0.018,   // 2019
+  0.012,   // 2020
+  0.047,   // 2021
+  0.080,   // 2022
+  0.041,   // 2023
+];
+
+// 世界平均インフレ率（IMF推計、1994-2023年）
+export const worldInflationRates = [
+  0.035,   // 1994
+  0.025,   // 1995
+  0.024,   // 1996
+  0.022,   // 1997
+  0.018,   // 1998
+  0.019,   // 1999
+  0.025,   // 2000
+  0.024,   // 2001
+  0.020,   // 2002
+  0.023,   // 2003
+  0.026,   // 2004
+  0.030,   // 2005
+  0.032,   // 2006
+  0.035,   // 2007
+  0.060,   // 2008
+  0.005,   // 2009
+  0.032,   // 2010
+  0.045,   // 2011
+  0.038,   // 2012
+  0.032,   // 2013
+  0.028,   // 2014
+  0.025,   // 2015
+  0.022,   // 2016
+  0.028,   // 2017
+  0.032,   // 2018
+  0.030,   // 2019
+  0.025,   // 2020
+  0.045,   // 2021
+  0.085,   // 2022
+  0.065,   // 2023
 ];
 
 // 仮想通貨のリターン（ビットコイン、2014-2023年の10年間）
@@ -103,57 +241,46 @@ export const cryptoReturns = [
 ];
 
 // 仮想通貨の実データが利用可能な年（2014年以降）
-export const cryptoDataStartYear = 2014;
-export const cryptoDataStartIndex = 20; // 1994年から数えて20番目
+// const cryptoDataStartIndex = 20; // 1994年から数えて20番目
 
 export const historicalYears = Array.from({ length: 30 }, (_, i) => 1994 + i);
 
-// ヒストリカルデータの統計情報
-export const getHistoricalStats = () => {
-  const sp500Avg = sp500Returns.reduce((a, b) => a + b, 0) / sp500Returns.length;
-  const inflationAvg = japanInflationRates.reduce((a, b) => a + b, 0) / japanInflationRates.length;
-  const cryptoRealData = cryptoReturns.slice(cryptoDataStartIndex); // 2014年以降の実データのみ
-  const cryptoAvg = cryptoRealData.reduce((a, b) => a + b, 0) / cryptoRealData.length;
+// データ選択用の型
+export type InflationRegion = 'japan' | 'us' | 'world';
+export type StockRegion = 'sp500' | 'nikkei' | 'world';
 
-  return {
-    sp500Average: sp500Avg,
-    inflationAverage: inflationAvg,
-    cryptoAverage: cryptoAvg,
-    dataYears: historicalYears.length,
-    maxSimulationYears: historicalYears.length,
-    cryptoRealDataYears: cryptoRealData.length
-  };
-};
-
-// 参考：過去の時代別リターン比較
-export const historicalComparison = {
-  // 1970年代-1980年代（高インフレ・高金利時代）
-  era1970s1980s: {
-    period: '1970-1989年',
-    sp500Avg: 0.135, // 約13.5%（高インフレ時代）
-    inflationAvg: 0.065, // 約6.5%（高インフレ）
-    realReturn: 0.07, // 実質リターン約7%
-    characteristics: ['高インフレ', '高金利', '石油危機', 'ボルカーショック']
-  },
-
-  // 1990年代-2000年代初期（ITバブル時代）
-  era1990s2000s: {
-    period: '1990-2009年',
-    sp500Avg: 0.095, // 約9.5%（ITバブル含む）
-    inflationAvg: 0.025, // 約2.5%
-    realReturn: 0.07, // 実質リターン約7%
-    characteristics: ['ITバブル', 'ドットコムクラッシュ', 'リーマンショック']
-  },
-
-  // 現在のデータ期間（低金利・QE時代）
-  currentEra: {
-    period: '1994-2023年（現在使用）',
-    sp500Avg: 0.105, // 約10.5%
-    inflationAvg: 0.024, // 約2.4%
-    realReturn: 0.081, // 実質リターン約8.1%
-    characteristics: ['低金利', '量的緩和', 'テック企業台頭', 'グローバル化']
+// インフレ率データの取得
+export const getInflationData = (region: InflationRegion): number[] => {
+  switch (region) {
+    case 'japan': return japanInflationRates;
+    case 'us': return usInflationRates;
+    case 'world': return worldInflationRates;
+    default: return japanInflationRates;
   }
 };
+
+// 株式リターンデータの取得
+export const getStockData = (region: StockRegion): number[] => {
+  switch (region) {
+    case 'sp500': return sp500Returns;
+    case 'nikkei': return nikkeiReturns;
+    case 'world': return worldStockReturns;
+    default: return sp500Returns;
+  }
+};
+
+// オプション用のデータ
+export const stockOptions = [
+  { value: 'sp500' as StockRegion, label: 'S&P500（アメリカ）' },
+  { value: 'nikkei' as StockRegion, label: '日経平均（日本）' },
+  { value: 'world' as StockRegion, label: '全世界株式' }
+];
+
+export const inflationOptions = [
+  { value: 'japan' as InflationRegion, label: '日本' },
+  { value: 'us' as InflationRegion, label: 'アメリカ' },
+  { value: 'world' as InflationRegion, label: '世界平均' }
+];
 
 // シミュレーション期間の制限チェック
 export const validateSimulationPeriod = (startAge: number, endAge: number) => {
