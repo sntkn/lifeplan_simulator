@@ -81,7 +81,7 @@ class HistoricalReturnCalculator implements ReturnCalculator {
     const inflationRate = inflationData[dataIndex] || 0.02;
 
     // デバッグ情報（長期シミュレーション時）
-    if (yearIndex === 1 && startYear < 3) {
+    if (yearIndex === 1 && startYear < 20) {
       console.log(`Pattern ${startYear + 1}: Starting from year ${1994 + startYear}, dataIndex: ${dataIndex}`);
     }
 
@@ -414,6 +414,14 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
   const simulationPeriod = params.endAge - params.initialAge;
   const actualStartYears = calculateHistoricalSimulationCount(simulationPeriod);
 
+  // 0〜(HISTORICAL_DATA_LENGTH-1)の配列を作り、シャッフルして先頭からactualStartYears個を使う
+  const startYearCandidates = Array.from({ length: HISTORICAL_DATA_LENGTH }, (_, i) => i);
+  for (let i = startYearCandidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [startYearCandidates[i], startYearCandidates[j]] = [startYearCandidates[j], startYearCandidates[i]];
+  }
+  const selectedStartYears = startYearCandidates.slice(0, actualStartYears);
+
   console.log(`Running ${actualStartYears} simulations for ${simulationPeriod} years`);
   if (simulationPeriod > HISTORICAL_DATA_LENGTH) {
     console.log(`Using cyclic historical data (${HISTORICAL_DATA_LENGTH} years repeated)`);
@@ -424,7 +432,7 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
   const allCryptoSimulations: number[][] = [];
   const allCashSimulations: number[][] = [];
 
-  for (let startYear = 0; startYear < actualStartYears; startYear++) {
+  for (const startYear of selectedStartYears) {
     const result = runSingleSimulation(params, returnCalculator, startYear);
     allSimulations.push(result.totalAssets);
     allStockSimulations.push(result.stockValues);
