@@ -14,8 +14,8 @@ import {
  * 30年を超える場合でも循環データを使用して複数パターンを確保
  */
 const calculateHistoricalSimulationCount = (simulationPeriod: number): number => {
-  if (simulationPeriod <= HISTORICAL_DATA_LENGTH) {
-    // 30年以内の場合：独立したパターンの最大数を計算
+  if (simulationPeriod < HISTORICAL_DATA_LENGTH / 3) {
+    // 10年以内の場合：独立したパターンの最大数を計算
     const maxIndependentPatterns = Math.max(1, HISTORICAL_DATA_LENGTH - simulationPeriod + 1);
     return Math.min(MAX_START_YEARS, maxIndependentPatterns);
   } else {
@@ -81,7 +81,7 @@ class HistoricalReturnCalculator implements ReturnCalculator {
     const inflationRate = inflationData[dataIndex] || 0.02;
 
     // デバッグ情報（長期シミュレーション時）
-    if (yearIndex === 1 && startYear < 20) {
+    if (yearIndex === 1 && startYear < HISTORICAL_DATA_LENGTH) {
       console.log(`Pattern ${startYear + 1}: Starting from year ${1994 + startYear}, dataIndex: ${dataIndex}`);
     }
 
