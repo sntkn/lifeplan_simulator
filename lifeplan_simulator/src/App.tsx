@@ -36,7 +36,7 @@ function App() {
       >
         {dark ? "ライトモード" : "ダークモード"}
       </button>
-      <h1 className="text-3xl font-bold mb-5">老後資産推移モンテカルロシミュレーター</h1>
+      <h1 className="text-3xl font-bold mb-5">資産推移シミュレーター</h1>
       <div className="flex w-full max-w-7xl gap-5">
         <InputPanel params={params} setParams={setParams} onSimulate={runSimulation} />
         <div className="flex-1 flex flex-col gap-5">
