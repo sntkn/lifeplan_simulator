@@ -106,45 +106,45 @@ ${simulationSettings}
 - 現在年齢: ${params.initialAge}歳
 - 退職年齢: ${params.retirementAge}歳
 - シミュレーション終了年齢: ${params.endAge}歳
-- 初期資産: ${Math.round((params.initialStockValue + params.initialCryptoValue + params.initialCashValue) / 10000)}万円
+- 初期資産: ${(params.initialStockValue + params.initialCryptoValue + params.initialCashValue).toLocaleString()}円
 - ${params.entertainmentExpensesDeclineStartAge}歳以上は年間${(params.entertainmentExpensesDeclineRate * 100).toFixed(1)}%で年間娯楽費が減少
 - ※年金は考慮していません
 
 【収支情報】
-- 年収: ${Math.round(params.salary / 10000)}万円
-- 年間生活費: ${Math.round(params.livingExpenses / 10000)}万円
-- 年間娯楽費: ${Math.round(params.entertainmentExpenses / 10000)}万円
-- 年間住宅維持費: ${Math.round(params.housingMaintenance / 10000)}万円
-- 年間医療・介護費: ${Math.round(params.medicalCare / 10000)}万円
+- 年収: ${params.salary.toLocaleString()}円
+- 年間生活費: ${params.livingExpenses.toLocaleString()}円
+- 年間娯楽費: ${params.entertainmentExpenses.toLocaleString()}円
+- 年間住宅維持費: ${params.housingMaintenance.toLocaleString()}円
+- 年間医療・介護費: ${params.medicalCare.toLocaleString()}円
 
 【資産配分の推移】
 ■初期時点（${initialResult.age}歳）
-- 株式: ${Math.round(params.initialStockValue / 10000)}万円
-- 仮想通貨: ${Math.round(params.initialCryptoValue / 10000)}万円
-- 現金: ${Math.round(params.initialCashValue / 10000)}万円
+- 株式: ${params.initialStockValue.toLocaleString()}円
+- 仮想通貨: ${params.initialCryptoValue.toLocaleString()}円
+- 現金: ${params.initialCashValue.toLocaleString()}円
 
 ■中間時点（${midResult.age}歳）
-- 株式: ${Math.round(midResult.medianStock / 10000)}万円
-- 仮想通貨: ${Math.round(midResult.medianCrypto / 10000)}万円
-- 現金: ${Math.round(midResult.medianCash / 10000)}万円
+- 株式: ${Math.round(midResult.medianStock).toLocaleString()}円
+- 仮想通貨: ${Math.round(midResult.medianCrypto).toLocaleString()}円
+- 現金: ${Math.round(midResult.medianCash).toLocaleString()}円
 
 ■最終時点（${finalResult.age}歳）
-- 株式: ${Math.round(finalResult.medianStock / 10000)}万円
-- 仮想通貨: ${Math.round(finalResult.medianCrypto / 10000)}万円
-- 現金: ${Math.round(finalResult.medianCash / 10000)}万円
+- 株式: ${Math.round(finalResult.medianStock).toLocaleString()}円
+- 仮想通貨: ${Math.round(finalResult.medianCrypto).toLocaleString()}円
+- 現金: ${Math.round(finalResult.medianCash).toLocaleString()}円
 
 【シミュレーション結果（3パターン）】
 ■最高パターン（90%タイル値）
-- ${midResult.age}歳時点: ${Math.round(midResult.p90 / 10000)}万円
-- ${finalResult.age}歳時点: ${Math.round(finalResult.p90 / 10000)}万円
+- ${midResult.age}歳時点: ${Math.round(midResult.p90).toLocaleString()}円
+- ${finalResult.age}歳時点: ${Math.round(finalResult.p90).toLocaleString()}円
 
 ■中央値パターン（50%タイル値）
-- ${midResult.age}歳時点: ${Math.round(midResult.median / 10000)}万円
-- ${finalResult.age}歳時点: ${Math.round(finalResult.median / 10000)}万円
+- ${midResult.age}歳時点: ${Math.round(midResult.median).toLocaleString()}円
+- ${finalResult.age}歳時点: ${Math.round(finalResult.median).toLocaleString()}円
 
 ■最低パターン（10%タイル値）
-- ${midResult.age}歳時点: ${Math.round(midResult.p10 / 10000)}万円
-- ${finalResult.age}歳時点: ${Math.round(finalResult.p10 / 10000)}万円
+- ${midResult.age}歳時点: ${Math.round(midResult.p10).toLocaleString()}円
+- ${finalResult.age}歳時点: ${Math.round(finalResult.p10).toLocaleString()}円
 
 【リスク評価】
 - 最終時点での資産枯渇リスク: ${finalResult.p10 <= 0 ? '高リスク' : finalResult.p25 <= 0 ? '中リスク' : '低リスク'}
