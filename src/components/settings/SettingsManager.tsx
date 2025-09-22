@@ -66,7 +66,7 @@ interface SettingsManagerProps {
 }
 
 /**
- * 設定の保存・読み込み・削除を管理するコンポーネント
+ * 設定の保存・読み込み・削除を管理するコンポーネント（モーダル用に最適化）
  */
 export const SettingsManager = ({ params, onLoadSetting }: SettingsManagerProps) => {
   /**
@@ -78,11 +78,6 @@ export const SettingsManager = ({ params, onLoadSetting }: SettingsManagerProps)
    * 設定保存用の名前入力の状態
    */
   const [saveSettingName, setSaveSettingName] = useState('');
-
-  /**
-   * 設定管理パネルの表示状態
-   */
-  const [showSettingsPanel, setShowSettingsPanel] = useState(false);
 
   /**
    * コンポーネント初期化時に保存された設定を読み込み
@@ -126,70 +121,59 @@ export const SettingsManager = ({ params, onLoadSetting }: SettingsManagerProps)
   };
 
   return (
-    <div className="mb-5 p-3 border rounded bg-gray-50 dark:bg-gray-800">
-      <button
-        onClick={() => setShowSettingsPanel(!showSettingsPanel)}
-        className="w-full p-2 text-sm font-bold bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-      >
-        {showSettingsPanel ? '設定管理を閉じる' : '設定管理を開く'}
-      </button>
-
-      {showSettingsPanel && (
-        <div className="mt-3">
-          {/* 設定保存 */}
-          <div className="mb-3">
-            <label className="block mb-1 text-sm font-bold">設定を保存</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={saveSettingName}
-                onChange={e => setSaveSettingName(e.target.value)}
-                placeholder="設定名を入力"
-                className="flex-1 p-1 text-sm border rounded"
-              />
-              <button
-                onClick={handleSaveSetting}
-                className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition"
-              >
-                保存
-              </button>
-            </div>
-          </div>
-
-          {/* 保存された設定一覧 */}
-          <div>
-            <label className="block mb-2 text-sm font-bold">保存された設定</label>
-            {savedSettings.length === 0 ? (
-              <p className="text-sm text-gray-500">保存された設定はありません</p>
-            ) : (
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {savedSettings.map((setting) => (
-                  <div key={setting.name} className="flex items-center gap-2 p-2 border rounded bg-white dark:bg-gray-700">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{setting.name}</div>
-                      <div className="text-xs text-gray-500">
-                        {new Date(setting.createdAt).toLocaleDateString('ja-JP')}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleLoadSetting(setting)}
-                      className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                    >
-                      読込
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSetting(setting.name)}
-                      className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition"
-                    >
-                      削除
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+    <div className="space-y-4">
+      {/* 設定保存 */}
+      <div>
+        <label className="block mb-2 text-sm font-bold text-gray-900 dark:text-gray-100">設定を保存</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={saveSettingName}
+            onChange={e => setSaveSettingName(e.target.value)}
+            placeholder="設定名を入力"
+            className="flex-1 p-2 text-sm border rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button
+            onClick={handleSaveSetting}
+            className="px-4 py-2 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+          >
+            保存
+          </button>
         </div>
-      )}
+      </div>
+
+      {/* 保存された設定一覧 */}
+      <div>
+        <label className="block mb-2 text-sm font-bold text-gray-900 dark:text-gray-100">保存された設定</label>
+        {savedSettings.length === 0 ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400">保存された設定はありません</p>
+        ) : (
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {savedSettings.map((setting) => (
+              <div key={setting.name} className="flex items-center gap-2 p-3 border rounded-md border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate text-gray-900 dark:text-gray-100">{setting.name}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {new Date(setting.createdAt).toLocaleDateString('ja-JP')}
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleLoadSetting(setting)}
+                  className="px-3 py-1 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  読込
+                </button>
+                <button
+                  onClick={() => handleDeleteSetting(setting.name)}
+                  className="px-3 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                >
+                  削除
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

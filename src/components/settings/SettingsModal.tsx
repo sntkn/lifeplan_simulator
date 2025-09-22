@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import type { SimulationParams } from '../../types/simulation';
+import { SettingsManager } from './SettingsManager';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -48,7 +49,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4"
       onClick={handleOverlayClick}
     >
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
@@ -59,7 +60,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
             aria-label="モーダルを閉じる"
           >
             <svg
@@ -81,10 +82,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* コンテンツ部分 */}
         <div className="p-6">
-          {/* TODO: ここに SettingsManager のコンテンツを配置 */}
-          <p className="text-gray-600 dark:text-gray-400">
-            設定管理機能をここに実装します
-          </p>
+          <SettingsManager
+            params={params}
+            onLoadSetting={onLoadSetting}
+          />
         </div>
       </div>
     </div>

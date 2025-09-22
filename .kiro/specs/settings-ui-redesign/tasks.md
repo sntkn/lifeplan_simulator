@@ -1,6 +1,6 @@
 # 実装計画
 
-- [x] 1. SettingsIcon コンポーネントの作成
+- [ ] 1. SettingsIcon コンポーネントの作成
   - SVG歯車アイコンまたはCSS歯車アイコンを実装
   - ホバー効果（回転アニメーション）を追加
   - クリックイベントハンドラーを実装
@@ -19,20 +19,20 @@
   - フォーカス管理とキーボードナビゲーションを実装
   - _要件: 2.3, 2.4_
 
-- [ ] 4. 既存SettingsManagerをモーダル用に調整
+- [x] 4. 既存SettingsManagerをモーダル用に調整
   - 外側のコンテナスタイルを削除（現在のborder, bg-gray-50等）
   - モーダル内表示に最適化したレイアウトに変更
   - 設定管理パネルの開閉ボタンを削除
   - 既存の設定保存・読み込み・削除機能を維持
   - _要件: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 5. SettingsModalにSettingsManagerを統合
+- [x] 5. SettingsModalにSettingsManagerを統合
   - SettingsModalのTODOコメント部分にSettingsManagerを配置
   - 適切なpropsを渡してSettingsManagerを動作させる
   - モーダル内でのレイアウト調整
   - _要件: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 6. InputPanelの更新
+- [x] 6. InputPanelの更新
   - 既存のSettingsManagerの直接埋め込みを削除
   - モーダル状態管理を追加（useState）
   - 歯車アイコンのonClickを実際のモーダル開閉に接続

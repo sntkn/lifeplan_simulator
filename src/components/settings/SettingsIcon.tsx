@@ -12,7 +12,7 @@ export const SettingsIcon: React.FC<SettingsIconProps> = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="settings-icon p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+      className="settings-icon p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
       aria-label="設定を開く"
       title="設定を開く"
     >
