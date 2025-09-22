@@ -1,6 +1,7 @@
 import { stockOptions, inflationOptions, type InflationRegion, type StockRegion } from '../../historicalData';
 import type { SimulationParams } from '../../types/simulation';
 import { SettingsManager } from '../settings/SettingsManager';
+import { SettingsIcon } from '../settings/SettingsIcon';
 
 interface InputPanelProps {
   params: SimulationParams;
@@ -58,7 +59,10 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
 
   return (
     <div className="w-[300px] p-5 border rounded-lg" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-      <h2 className="text-lg font-bold mt-0 mb-4">シミュレーション設定</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold mt-0">シミュレーション設定</h2>
+        <SettingsIcon onClick={() => alert('Settings icon clicked!')} />
+      </div>
 
       {/* 設定管理パネル */}
       <SettingsManager params={params} onLoadSetting={setParams} />
