@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { stockOptions, inflationOptions, type InflationRegion, type StockRegion } from '../../historicalData';
 import type { SimulationParams } from '../../types/simulation';
-import { SettingsManager } from '../settings/SettingsManager';
+import { SettingsIcon } from '../settings/SettingsIcon';
+import { SettingsModal } from '../settings/SettingsModal';
 
 interface InputPanelProps {
   params: SimulationParams;
@@ -16,6 +18,11 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
    * 万円単位を円単位に変換するための定数
    */
   const JPY_UNIT = 10000;
+
+  /**
+   * 設定モーダルの開閉状態
+   */
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   /**
    * 万円単位の入力値を円単位に変換して状態を更新します。
@@ -58,13 +65,12 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
 
   return (
     <div className="w-[300px] p-5 border rounded-lg" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-      <h2 className="text-lg font-bold mt-0 mb-4">シミュレーション設定</h2>
-
-      {/* 設定管理パネル */}
-      <SettingsManager params={params} onLoadSetting={setParams} />
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold mt-0">シミュレーション設定</h2>
+        <SettingsIcon onClick={() => setIsSettingsModalOpen(true)} />
+      </div>
 
       <div className="mb-5">
-        <h3 className="text-base font-bold mb-3">シミュレーション方法</h3>
         <label className="block mb-1 font-bold">シミュレーション方法</label>
         <select
           value={params.simulationMethod}
@@ -231,6 +237,14 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
       <div className="mt-5">
         <button onClick={onSimulate} className="w-full p-2.5 border rounded-t-full rounded-b-full cursor-pointer text-base">シミュレーション実行</button>
       </div>
+
+      {/* 設定管理モーダル */}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        params={params}
+        onLoadSetting={setParams}
+      />
     </div>
   );
 };
