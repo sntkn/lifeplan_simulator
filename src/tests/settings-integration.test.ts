@@ -5,24 +5,10 @@
  * according to the requirements in the spec.
  */
 
-// Mock DOM environment for testing
-const mockLocalStorage = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: (key: string) => store[key] || null,
-    setItem: (key: string, value: string) => { store[key] = value; },
-    removeItem: (key: string) => { delete store[key]; },
-    clear: () => { store = {}; }
-  };
-})();
-
-// Mock localStorage
-Object.defineProperty(window, 'localStorage', {
-  value: mockLocalStorage
-});
+import type { SimulationParams } from '../types/simulation';
 
 // Test data
-const mockParams = {
+const mockParams: SimulationParams = {
   initialAge: 30,
   endAge: 65,
   simulationMethod: 'montecarlo' as const,
@@ -54,13 +40,14 @@ const mockParams = {
   housingLoan: 1200000,
   salary: 6000000,
   realEstateIncome: 0,
-  stockRegion: 'japan' as const,
+  stockRegion: 'nikkei' as const,
   inflationRegion: 'japan' as const
 };
 
 describe('Settings UI Integration Tests', () => {
   beforeEach(() => {
-    mockLocalStorage.clear();
+    localStorage.clear();
+    jest.clearAllMocks();
   });
 
   describe('Settings Storage Functionality', () => {
@@ -72,9 +59,9 @@ describe('Settings UI Integration Tests', () => {
         createdAt: new Date().toISOString()
       }];
 
-      mockLocalStorage.setItem('lifeplan-simulator-settings', JSON.stringify(settings));
+      localStorage.setItem('lifeplan-simulator-settings', JSON.stringify(settings));
 
-      const saved = JSON.parse(mockLocalStorage.getItem('lifeplan-simulator-settings') || '[]');
+      const saved = JSON.parse(localStorage.getItem('lifeplan-simulator-settings') || '[]');
       expect(saved).toHaveLength(1);
       expect(saved[0].name).toBe(settingName);
       expect(saved[0].params.initialAge).toBe(mockParams.initialAge);
@@ -87,9 +74,9 @@ describe('Settings UI Integration Tests', () => {
         createdAt: new Date().toISOString()
       }];
 
-      mockLocalStorage.setItem('lifeplan-simulator-settings', JSON.stringify(settings));
+      localStorage.setItem('lifeplan-simulator-settings', JSON.stringify(settings));
 
-      const loaded = JSON.parse(mockLocalStorage.getItem('lifeplan-simulator-settings') || '[]');
+      const loaded = JSON.parse(localStorage.getItem('lifeplan-simulator-settings') || '[]');
       expect(loaded).toHaveLength(1);
       expect(loaded[0].name).toBe('Test Setting');
     });
@@ -108,31 +95,28 @@ describe('Settings UI Integration Tests', () => {
         }
       ];
 
-      mockLocalStorage.setItem('lifeplan-simulator-settings', JSON.stringify(settings));
+      localStorage.setItem('lifeplan-simulator-settings', JSON.stringify(settings));
 
       // Delete one setting
       const filteredSettings = settings.filter(s => s.name !== 'Setting 1');
-      mockLocalStorage.setItem('lifeplan-simulator-settings', JSON.stringify(filteredSettings));
+      localStorage.setItem('lifeplan-simulator-settings', JSON.stringify(filteredSettings));
 
-      const remaining = JSON.parse(mockLocalStorage.getItem('lifeplan-simulator-settings') || '[]');
+      const remaining = JSON.parse(localStorage.getItem('lifeplan-simulator-settings') || '[]');
       expect(remaining).toHaveLength(1);
       expect(remaining[0].name).toBe('Setting 2');
     });
 
     test('should handle empty localStorage gracefully', () => {
-      const loaded = JSON.parse(mockLocalStorage.getItem('lifeplan-simulator-settings') || '[]');
+      const loaded = JSON.parse(localStorage.getItem('lifeplan-simulator-settings') || '[]');
       expect(loaded).toHaveLength(0);
     });
 
     test('should handle corrupted localStorage data', () => {
-      mockLocalStorage.setItem('lifeplan-simulator-settings', 'invalid json');
+      localStorage.setItem('lifeplan-simulator-settings', 'invalid json');
 
-      try {
-        JSON.parse(mockLocalStorage.getItem('lifeplan-simulator-settings') || '[]');
-      } catch (error) {
-        // Should handle gracefully in actual implementation
-        expect(error).toBeDefined();
-      }
+      expect(() => {
+        JSON.parse(localStorage.getItem('lifeplan-simulator-settings') || '[]');
+      }).toThrow();
     });
   });
 
