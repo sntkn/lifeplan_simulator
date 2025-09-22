@@ -124,7 +124,7 @@ export const SettingsManager = ({ params, onLoadSetting }: SettingsManagerProps)
     <div className="space-y-4">
       {/* 設定保存 */}
       <div>
-        <label className="block mb-2 text-sm font-bold text-gray-900 dark:text-gray-100">設定を保存</label>
+        <label className="block mb-2 text-sm font-bold text-gray-900 dark:text-gray-100">現在の設定を保存</label>
         <div className="flex gap-2">
           <input
             type="text"

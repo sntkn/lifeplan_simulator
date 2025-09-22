@@ -71,7 +71,6 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
       </div>
 
       <div className="mb-5">
-        <h3 className="text-base font-bold mb-3">シミュレーション方法</h3>
         <label className="block mb-1 font-bold">シミュレーション方法</label>
         <select
           value={params.simulationMethod}

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings UI Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        .pass { background: #d4edda; border-left: 4px solid #28a745; }
+        .fail { background: #f8d7da; border-left: 4px solid #dc3545; }
+        .pending { background: #fff3cd; border-left: 4px solid #ffc107; }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .checkbox {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Settings UI Redesign - Integration Test</h1>
+    
+    <div class="instructions">
+        <h3>テスト手順</h3>
+        <p>このテストは、設定UI再設計の統合テストです。以下の手順に従って、各機能が正常に動作することを確認してください。</p>
+        <p><strong>前提条件:</strong> アプリケーションが http://localhost:5173/ で動作していること</p>
+        <button onclick="window.open('http://localhost:5173/', '_blank')">アプリケーションを開く</button>
+    </div>
+
+    <div class="test-section">
+        <h3>1. 歯車アイコンクリック → モーダル表示の動作確認</h3>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test1-1">
+            <label for="test1-1">歯車アイコンが「シミュレーション設定」ヘッダーの右端に表示されている</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test1-2">
+            <label for="test1-2">歯車アイコンにマウスオーバーすると回転アニメーション（ホバー効果）が表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test1-3">
+            <label for="test1-3">歯車アイコンをクリックするとモーダルポップアップが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test1-4">
+            <label for="test1-4">モーダル表示時に背景がオーバーレイで暗くなる</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test1-5">
+            <label for="test1-5">モーダルが画面中央に配置される</label>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. モーダル内での設定保存・読み込み・削除の動作確認</h3>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-1">
+            <label for="test2-1">モーダル内に「設定を保存」セクションが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-2">
+            <label for="test2-2">設定名を入力して保存ボタンをクリックすると設定が保存され、成功メッセージが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-3">
+            <label for="test2-3">設定名が空の場合、エラーメッセージが表示され保存が拒否される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-4">
+            <label for="test2-4">「保存された設定」セクションが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-5">
+            <label for="test2-5">保存された設定がある場合、設定名、作成日、読込ボタン、削除ボタンが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-6">
+            <label for="test2-6">保存された設定がない場合、「保存された設定はありません」メッセージが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-7">
+            <label for="test2-7">読込ボタンをクリックすると設定が読み込まれ、成功メッセージが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test2-8">
+            <label for="test2-8">削除ボタンをクリックすると確認ダイアログが表示され、確認後に設定が削除される</label>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. 各種モーダル閉じる操作の動作確認</h3>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test3-1">
+            <label for="test3-1">モーダル右上に×ボタンが表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test3-2">
+            <label for="test3-2">×ボタンをクリックするとモーダルが閉じる</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test3-3">
+            <label for="test3-3">×ボタンにマウスオーバーするとホバー効果が表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test3-4">
+            <label for="test3-4">ESCキーを押すとモーダルが閉じる</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test3-5">
+            <label for="test3-5">モーダル背景（オーバーレイ）をクリックするとモーダルが閉じる</label>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. ダークモード切り替え時の表示確認</h3>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test4-1">
+            <label for="test4-1">ライトモードで歯車アイコンが適切な色で表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test4-2">
+            <label for="test4-2">ダークモードで歯車アイコンが適切な色で表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test4-3">
+            <label for="test4-3">ライトモードでモーダルが適切なスタイルで表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test4-4">
+            <label for="test4-4">ダークモードでモーダルが適切なスタイルで表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test4-5">
+            <label for="test4-5">ダークモード切り替え時にモーダル内のコンテンツも適切に切り替わる</label>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. レスポンシブデザインの確認</h3>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test5-1">
+            <label for="test5-1">デスクトップサイズでモーダルが適切なサイズで表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test5-2">
+            <label for="test5-2">タブレットサイズでモーダルが適切にレスポンシブ表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test5-3">
+            <label for="test5-3">モバイルサイズでモーダルが適切にレスポンシブ表示される</label>
+        </div>
+        
+        <div class="test-item pending">
+            <input type="checkbox" class="checkbox" id="test5-4">
+            <label for="test5-4">設定一覧が多い場合、スクロール可能な領域が提供される</label>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>テスト結果サマリー</h3>
+        <div id="summary">
+            <p>完了したテスト: <span id="completed">0</span> / <span id="total">0</span></p>
+            <p>成功率: <span id="success-rate">0%</span></p>
+        </div>
+        <button onclick="generateReport()">レポート生成</button>
+        <button onclick="resetTests()">テストリセット</button>
+    </div>
+
+    <script>
+        // テスト項目の管理
+        function updateSummary() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const total = checkboxes.length;
+            const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const successRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('total').textContent = total;
+            document.getElementById('completed').textContent = completed;
+            document.getElementById('success-rate').textContent = successRate + '%';
+            
+            // テスト項目の色を更新
+            checkboxes.forEach(cb => {
+                const testItem = cb.closest('.test-item');
+                testItem.className = 'test-item ' + (cb.checked ? 'pass' : 'pending');
+            });
+        }
+        
+        // チェックボックスの変更を監視
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                updateSummary();
+            }
+        });
+        
+        // レポート生成
+        function generateReport() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const results = Array.from(checkboxes).map(cb => ({
+                id: cb.id,
+                label: cb.nextElementSibling.textContent,
+                passed: cb.checked
+            }));
+            
+            const report = {
+                timestamp: new Date().toISOString(),
+                totalTests: results.length,
+                passedTests: results.filter(r => r.passed).length,
+                results: results
+            };
+            
+            console.log('Integration Test Report:', report);
+            alert('テストレポートがコンソールに出力されました。開発者ツールで確認してください。');
+        }
+        
+        // テストリセット
+        function resetTests() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateSummary();
+        }
+        
+        // 初期化
+        updateSummary();
+    </script>
+</body>
+</html>
