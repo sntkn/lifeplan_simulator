@@ -215,20 +215,42 @@ const runSingleSimulation = (
 
         const assetValue = priorityAsset === 'crypto' ? cryptoValue : stockValue;
         const assetLowerLimit = priorityAsset === 'crypto' ? cryptoLowerLimit : stockLowerLimit;
-        const taxRate = priorityAsset === 'crypto' ? cryptoTaxRate : stockTaxRate;
+        const rawTaxRate = priorityAsset === 'crypto' ? cryptoTaxRate : stockTaxRate;
 
         const availableToSell = assetValue - assetLowerLimit;
-        if (availableToSell > 0) {
-          const sellAmount = Math.min(deficit * taxRate, availableToSell);
-          if (priorityAsset === 'crypto') {
-            cryptoValue -= sellAmount;
-          } else {
-            stockValue -= sellAmount;
-          }
-          const cashGained = sellAmount / taxRate;
-          cashValue += cashGained;
-          deficit -= cashGained;
+        if (availableToSell <= 0) return;
+
+        // taxRate は fraction（例: 0.10 = 10%）であることを前提とする
+        const taxFraction = rawTaxRate;
+
+        // 範囲チェック: 負の値や 100% 以上は想定外 -> 警告して換金不可扱い
+        if (taxFraction < 0) {
+          console.warn(`Invalid tax rate ${rawTaxRate} for ${priorityAsset}: negative tax treated as 0`);
+          return;
         }
+        if (taxFraction >= 1) {
+          console.warn(`Invalid tax rate ${rawTaxRate} for ${priorityAsset}: expected fraction < 1 (e.g. 0.1 for 10%)`);
+          return;
+        }
+
+        // 必要な純受取額(deficit) を得るための売却総額（gross）を計算
+        const grossNeeded = deficit / (1 - taxFraction);
+
+        // 実際に売却する総額（上限は availableToSell）
+        const grossToSell = Math.min(grossNeeded, availableToSell);
+
+        // 売却後の手取り（税引き後）
+        const cashGained = grossToSell * (1 - taxFraction);
+
+        // 資産から差し引くのは総（gross）売却額
+        if (priorityAsset === 'crypto') {
+          cryptoValue -= grossToSell;
+        } else {
+          stockValue -= grossToSell;
+        }
+
+        cashValue += cashGained;
+        deficit -= cashGained;
       };
 
       switch (params.liquidationPriority) {

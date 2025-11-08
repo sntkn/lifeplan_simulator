@@ -38,3 +38,10 @@ global.console = {
   warn: jest.fn(),
   error: jest.fn(),
 };
+
+// Mock ResizeObserver for recharts
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
