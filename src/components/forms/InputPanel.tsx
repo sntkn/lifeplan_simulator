@@ -3,6 +3,7 @@ import { stockOptions, inflationOptions, type InflationRegion, type StockRegion 
 import type { SimulationParams } from '../../types/simulation';
 import { SettingsIcon } from '../settings/SettingsIcon';
 import { SettingsModal } from '../settings/SettingsModal';
+import { NumberInput } from './NumberInput';
 
 interface InputPanelProps {
   params: SimulationParams;
@@ -23,45 +24,6 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
    * 設定モーダルの開閉状態
    */
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-
-  /**
-   * 万円単位の入力値を円単位に変換して状態を更新します。
-   * @param field 更新するパラメータのフィールド名
-   * @param value 入力値
-   */
-  const handleManYenChange = (field: keyof SimulationParams, value: string) => {
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      setParams({ ...params, [field]: numValue * JPY_UNIT });
-    }
-  };
-
-  /**
-   * 入力値を数値に変換して状態を更新します。
-   * @param field 更新するパラメータのフィールド名
-   * @param value 入力値
-   */
-  const handleChange = (field: keyof SimulationParams, value: string) => {
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      // 終了年齢の場合は範囲チェック
-      if (field === 'endAge') {
-        const maxAge = 120; // 全ての方法で120歳まで対応
-        const clampedValue = Math.min(Math.max(numValue, params.initialAge + 1), maxAge);
-        setParams({ ...params, [field]: clampedValue });
-      } else if (field === 'initialAge') {
-        // 初期年齢が変更された場合、終了年齢も調整
-        const newParams = { ...params, [field]: numValue };
-        const maxAge = 120;
-        if (newParams.endAge <= numValue || newParams.endAge > maxAge) {
-          newParams.endAge = Math.min(numValue + 1, maxAge);
-        }
-        setParams(newParams);
-      } else {
-        setParams({ ...params, [field]: numValue });
-      }
-    }
-  };
 
   return (
     <div className="w-[300px] p-5 border rounded-lg" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
@@ -93,8 +55,11 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
               <p>• 多数回実行して統計的な分布を算出</p>
               <p>• 将来の不確実性を数値化</p>
             </div>
-            <label className="block mb-1 font-bold">シミュレーション回数</label>
-            <input type="number" value={params.numSimulations} onChange={e => handleChange('numSimulations', e.target.value)} className="w-full p-2 border rounded box-border" />
+            <NumberInput
+              label="シミュレーション回数"
+              value={params.numSimulations}
+              onChange={(value) => setParams({ ...params, numSimulations: value })}
+            />
           </>
         )}
 
@@ -140,16 +105,28 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
 
       <div className="mb-5">
         <h3 className="text-base font-bold mb-3">基本項目</h3>
-        <label className="block mb-1 font-bold">初期年齢</label>
-        <input type="number" value={params.initialAge} onChange={e => handleChange('initialAge', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">終了年齢（最大120歳）</label>
-        <input
-          type="number"
+        <NumberInput
+          label="初期年齢"
+          value={params.initialAge}
+          onChange={(value) => {
+            const newParams = { ...params, initialAge: value };
+            const maxAge = 120;
+            if (newParams.endAge <= value || newParams.endAge > maxAge) {
+              newParams.endAge = Math.min(value + 1, maxAge);
+            }
+            setParams(newParams);
+          }}
+        />
+        <NumberInput
+          label="終了年齢（最大120歳）"
+          value={params.endAge}
+          onChange={(value) => {
+            const maxAge = 120;
+            const clampedValue = Math.min(Math.max(value, params.initialAge + 1), maxAge);
+            setParams({ ...params, endAge: clampedValue });
+          }}
           min={params.initialAge + 1}
           max={120}
-          value={params.endAge}
-          onChange={e => handleChange('endAge', e.target.value)}
-          className="w-full p-2 border rounded box-border"
         />
         {params.simulationMethod === 'historical' && (params.endAge - params.initialAge) > 30 && (
           <div className="mt-1 text-sm text-blue-600 dark:text-blue-400">
@@ -159,79 +136,181 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
 
         {params.simulationMethod === 'montecarlo' && (
           <>
-            <label className="block mb-1 font-bold">インフレ率</label>
-            <input type="number" step="0.01" value={params.inflationRate} onChange={e => handleChange('inflationRate', e.target.value)} className="w-full p-2 border rounded box-border" />
-            <label className="block mb-1 font-bold">株式の期待リターン（年率）</label>
-            <input type="number" step="0.01" value={params.investmentReturnRate} onChange={e => handleChange('investmentReturnRate', e.target.value)} className="w-full p-2 border rounded box-border" />
-            <label className="block mb-1 font-bold">株式のリスク（標準偏差）</label>
-            <input type="number" step="0.01" value={params.investmentRisk} onChange={e => handleChange('investmentRisk', e.target.value)} className="w-full p-2 border rounded box-border" />
-            <label className="block mb-1 font-bold">仮想通貨の期待リターン（年率）</label>
-            <input type="number" step="0.01" value={params.cryptoReturnRate} onChange={e => handleChange('cryptoReturnRate', e.target.value)} className="w-full p-2 border rounded box-border" />
-            <label className="block mb-1 font-bold">仮想通貨のリスク（標準偏差）</label>
-            <input type="number" step="0.01" value={params.cryptoRisk} onChange={e => handleChange('cryptoRisk', e.target.value)} className="w-full p-2 border rounded box-border" />
+            <NumberInput
+              label="インフレ率"
+              value={params.inflationRate}
+              onChange={(value) => setParams({ ...params, inflationRate: value })}
+              step={0.01}
+            />
+            <NumberInput
+              label="株式の期待リターン（年率）"
+              value={params.investmentReturnRate}
+              onChange={(value) => setParams({ ...params, investmentReturnRate: value })}
+              step={0.01}
+            />
+            <NumberInput
+              label="株式のリスク（標準偏差）"
+              value={params.investmentRisk}
+              onChange={(value) => setParams({ ...params, investmentRisk: value })}
+              step={0.01}
+            />
+            <NumberInput
+              label="仮想通貨の期待リターン（年率）"
+              value={params.cryptoReturnRate}
+              onChange={(value) => setParams({ ...params, cryptoReturnRate: value })}
+              step={0.01}
+            />
+            <NumberInput
+              label="仮想通貨のリスク（標準偏差）"
+              value={params.cryptoRisk}
+              onChange={(value) => setParams({ ...params, cryptoRisk: value })}
+              step={0.01}
+            />
           </>
         )}
 
-        <label className="block mb-1 font-bold">株売却時のコスト（税金等）</label>
-        <input type="number" step="0.01" value={params.stockTaxRate} onChange={e => handleChange('stockTaxRate', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">仮想通貨売却時のコスト（税金等）</label>
-        <input type="number" step="0.01" value={params.cryptoTaxRate} onChange={e => handleChange('cryptoTaxRate', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">現金保有の上限（万円）</label>
-        <input type="number" value={params.cashUpperLimit / JPY_UNIT} onChange={e => handleManYenChange('cashUpperLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">現金保有の下限（万円）</label>
-        <input type="number" value={params.cashLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cashLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">仮想通貨保有の下限（万円）</label>
-        <input type="number" value={params.cryptoLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('cryptoLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">株保有額の下限（万円）</label>
-        <input type="number" value={params.stockLowerLimit / JPY_UNIT} onChange={e => handleManYenChange('stockLowerLimit', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <NumberInput
+          label="株売却時のコスト（税金等 0.1=10%）"
+          value={params.stockTaxRate}
+          onChange={(value) => setParams({ ...params, stockTaxRate: value })}
+          step={0.01}
+        />
+        <NumberInput
+          label="仮想通貨売却時のコスト（税金等 0.1=10%）"
+          value={params.cryptoTaxRate}
+          onChange={(value) => setParams({ ...params, cryptoTaxRate: value })}
+          step={0.01}
+        />
+        <NumberInput
+          label="現金保有の上限（万円）"
+          value={params.cashUpperLimit}
+          onChange={(value) => setParams({ ...params, cashUpperLimit: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="現金保有の下限（万円）"
+          value={params.cashLowerLimit}
+          onChange={(value) => setParams({ ...params, cashLowerLimit: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="仮想通貨保有の下限（万円）"
+          value={params.cryptoLowerLimit}
+          onChange={(value) => setParams({ ...params, cryptoLowerLimit: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="株保有額の下限（万円）"
+          value={params.stockLowerLimit}
+          onChange={(value) => setParams({ ...params, stockLowerLimit: value })}
+          unit={JPY_UNIT}
+        />
         <label className="block mb-1 font-bold">現金不足時の優先取り崩し資産</label>
         <select value={params.liquidationPriority} onChange={e => setParams({ ...params, liquidationPriority: e.target.value as 'crypto' | 'stock' | 'random' })} className="w-full p-2 border rounded box-border">
           <option value="crypto">仮想通貨</option>
           <option value="stock">株式</option>
           <option value="random">ランダム</option>
         </select>
-        <label className="block mb-1 font-bold">仕事をリタイアする年齢</label>
-        <input type="number" value={params.retirementAge} onChange={e => handleChange('retirementAge', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">ローン年数</label>
-        <input type="number" value={params.loanDuration} onChange={e => handleChange('loanDuration', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">年間医療・介護費が発生する年齢</label>
-        <input type="number" value={params.medicalCareStartAge} onChange={e => handleChange('medicalCareStartAge', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">娯楽費が減少し始める年齢</label>
-        <input type="number" value={params.entertainmentExpensesDeclineStartAge} onChange={e => handleChange('entertainmentExpensesDeclineStartAge', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">娯楽費の年間減少率（0.1 = 10%減少）</label>
-        <input type="number" step="0.01" min="0" max="1" value={params.entertainmentExpensesDeclineRate} onChange={e => handleChange('entertainmentExpensesDeclineRate', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <NumberInput
+          label="仕事をリタイアする年齢"
+          value={params.retirementAge}
+          onChange={(value) => setParams({ ...params, retirementAge: value })}
+        />
+        <NumberInput
+          label="ローン年数"
+          value={params.loanDuration}
+          onChange={(value) => setParams({ ...params, loanDuration: value })}
+        />
+        <NumberInput
+          label="年間医療・介護費が発生する年齢"
+          value={params.medicalCareStartAge}
+          onChange={(value) => setParams({ ...params, medicalCareStartAge: value })}
+        />
+        <NumberInput
+          label="娯楽費が減少し始める年齢"
+          value={params.entertainmentExpensesDeclineStartAge}
+          onChange={(value) => setParams({ ...params, entertainmentExpensesDeclineStartAge: value })}
+        />
+        <NumberInput
+          label="娯楽費の年間減少率（0.1 = 10%減少）"
+          value={params.entertainmentExpensesDeclineRate}
+          onChange={(value) => setParams({ ...params, entertainmentExpensesDeclineRate: value })}
+          step={0.01}
+          min={0}
+          max={1}
+        />
       </div>
 
       <div className="mb-5">
         <h3 className="text-base font-bold mb-3">資産初期値（万円）</h3>
-        <label className="block mb-1 font-bold">株保有額</label>
-        <input type="number" value={params.initialStockValue / JPY_UNIT} onChange={e => handleManYenChange('initialStockValue', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">仮想通貨保有額</label>
-        <input type="number" value={params.initialCryptoValue / JPY_UNIT} onChange={e => handleManYenChange('initialCryptoValue', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">現金</label>
-        <input type="number" value={params.initialCashValue / JPY_UNIT} onChange={e => handleManYenChange('initialCashValue', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <NumberInput
+          label="株保有額"
+          value={params.initialStockValue}
+          onChange={(value) => setParams({ ...params, initialStockValue: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="仮想通貨保有額"
+          value={params.initialCryptoValue}
+          onChange={(value) => setParams({ ...params, initialCryptoValue: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="現金"
+          value={params.initialCashValue}
+          onChange={(value) => setParams({ ...params, initialCashValue: value })}
+          unit={JPY_UNIT}
+        />
       </div>
 
       <div className="mb-5">
         <h3 className="text-base font-bold mb-3">年間支出（万円）</h3>
-        <label className="block mb-1 font-bold">生活費</label>
-        <input type="number" value={params.livingExpenses / JPY_UNIT} onChange={e => handleManYenChange('livingExpenses', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">娯楽費</label>
-        <input type="number" value={params.entertainmentExpenses / JPY_UNIT} onChange={e => handleManYenChange('entertainmentExpenses', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">住宅維持費</label>
-        <input type="number" value={params.housingMaintenance / JPY_UNIT} onChange={e => handleManYenChange('housingMaintenance', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">医療・介護費</label>
-        <input type="number" value={params.medicalCare / JPY_UNIT} onChange={e => handleManYenChange('medicalCare', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">住宅ローン</label>
-        <input type="number" value={params.housingLoan / JPY_UNIT} onChange={e => handleManYenChange('housingLoan', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <NumberInput
+          label="生活費"
+          value={params.livingExpenses}
+          onChange={(value) => setParams({ ...params, livingExpenses: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="娯楽費"
+          value={params.entertainmentExpenses}
+          onChange={(value) => setParams({ ...params, entertainmentExpenses: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="住宅維持費"
+          value={params.housingMaintenance}
+          onChange={(value) => setParams({ ...params, housingMaintenance: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="医療・介護費"
+          value={params.medicalCare}
+          onChange={(value) => setParams({ ...params, medicalCare: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="住宅ローン"
+          value={params.housingLoan}
+          onChange={(value) => setParams({ ...params, housingLoan: value })}
+          unit={JPY_UNIT}
+        />
       </div>
 
       <div className="mb-5">
         <h3 className="text-base font-bold mb-3">年間収入（万円）</h3>
-        <label className="block mb-1 font-bold">給与所得</label>
-        <input type="number" value={params.salary / JPY_UNIT} onChange={e => handleManYenChange('salary', e.target.value)} className="w-full p-2 border rounded box-border" />
-        <label className="block mb-1 font-bold">不動産所得</label>
-        <input type="number" value={params.realEstateIncome / JPY_UNIT} onChange={e => handleManYenChange('realEstateIncome', e.target.value)} className="w-full p-2 border rounded box-border" />
+        <NumberInput
+          label="給与所得"
+          value={params.salary}
+          onChange={(value) => setParams({ ...params, salary: value })}
+          unit={JPY_UNIT}
+        />
+        <NumberInput
+          label="不動産所得"
+          value={params.realEstateIncome}
+          onChange={(value) => setParams({ ...params, realEstateIncome: value })}
+          unit={JPY_UNIT}
+        />
       </div>
 
       <div className="mt-5">
