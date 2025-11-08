@@ -36,7 +36,7 @@ export const useSimulation = () => {
     entertainmentExpenses: 500000,
     housingMaintenance: 600000,
     medicalCare: 750000,
-    housingLoan: 210000,
+    housingLoan: 1200000,
     salary: 3000000,
     realEstateIncome: 0,
     numSimulations: 1000,
