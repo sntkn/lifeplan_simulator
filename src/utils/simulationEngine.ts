@@ -82,7 +82,7 @@ class HistoricalReturnCalculator implements ReturnCalculator {
 
     // デバッグ情報（長期シミュレーション時）
     if (yearIndex === 1 && startYear < HISTORICAL_DATA_LENGTH) {
-      console.log(`Pattern ${startYear + 1}: Starting from year ${1994 + startYear}, dataIndex: ${dataIndex}`);
+      console.log(`Pattern ${startYear + 1}: Starting from year ${1996 + startYear}, dataIndex: ${dataIndex}`);
     }
 
     // NaNチェック

@@ -240,8 +240,6 @@ export const cryptoReturns = [
   -0.0600, // 2025 - ビットコイン実データ
 ];
 
-// 仮想通貨の実データが利用可能な年（2014年以降）
-// const cryptoDataStartIndex = 20; // 1994年から数えて20番目
 
 export const historicalYears = Array.from({ length: 30 }, (_, i) => 1996 + i);
 

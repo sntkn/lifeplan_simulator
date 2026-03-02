@@ -67,7 +67,7 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
           <>
             <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded text-sm mb-3">
               <p className="font-bold mb-2">ヒストリカル法について：</p>
-              <p>• 過去30年データを使用（1994-2023年）</p>
+              <p>• 過去30年データを使用（1996-2025年）</p>
               <p>• 複数の開始年でシミュレーション実行</p>
               <p>• 実際の市場変動パターンを再現</p>
               <p>• 仮想通貨：2014年以前は株式リターンを適用</p>
