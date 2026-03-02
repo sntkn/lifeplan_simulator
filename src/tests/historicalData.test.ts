@@ -35,9 +35,9 @@ describe('Historical Data Arrays', () => {
     expect(historicalYears).toHaveLength(30);
   });
 
-  test('historical years range from 1994 to 2023', () => {
-    expect(historicalYears[0]).toBe(1994);
-    expect(historicalYears[29]).toBe(2023);
+  test('historical years range from 1996 to 2025', () => {
+    expect(historicalYears[0]).toBe(1996);
+    expect(historicalYears[29]).toBe(2025);
   });
 
   test('constants have correct values', () => {
