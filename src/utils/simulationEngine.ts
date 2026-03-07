@@ -14,14 +14,13 @@ import {
  * 30年を超える場合でも循環データを使用して複数パターンを確保
  */
 const calculateHistoricalSimulationCount = (simulationPeriod: number): number => {
-  if (simulationPeriod < HISTORICAL_DATA_LENGTH / 3) {
-    // 10年以内の場合：独立したパターンの最大数を計算
-    const maxIndependentPatterns = Math.max(1, HISTORICAL_DATA_LENGTH - simulationPeriod + 1);
-    return Math.min(MAX_START_YEARS, maxIndependentPatterns);
-  } else {
-    // 30年を超える場合：循環データを使用して常に10パターンを確保
+  if (simulationPeriod >= HISTORICAL_DATA_LENGTH) {
+    // 30年ちょうど、あるいはそれ以上は循環データを利用して常に最大パターン数を確保
     return MAX_START_YEARS;
   }
+
+  const maxIndependentPatterns = Math.max(1, HISTORICAL_DATA_LENGTH - simulationPeriod + 1);
+  return Math.min(MAX_START_YEARS, maxIndependentPatterns);
 };
 
 // --- Return Calculation Strategies ---
@@ -63,7 +62,8 @@ class MonteCarloReturnCalculator implements ReturnCalculator {
 class HistoricalReturnCalculator implements ReturnCalculator {
   constructor(
     private stockRegion: 'sp500' | 'nikkei' | 'world',
-    private inflationRegion: 'japan' | 'us' | 'world'
+    private inflationRegion: 'japan' | 'us' | 'world',
+    private useCyclicData: boolean
   ) { }
 
   calculateReturns(yearIndex: number, startYear: number = 0): {
@@ -71,8 +71,16 @@ class HistoricalReturnCalculator implements ReturnCalculator {
     cryptoReturn: number;
     inflationRate: number;
   } {
-    // 循環データインデックスの計算（30年を超える場合でも対応）
-    const dataIndex = (startYear + yearIndex - 1) % HISTORICAL_DATA_LENGTH;
+    const naiveIndex = startYear + yearIndex - 1;
+    const dataIndex = this.useCyclicData
+      ? naiveIndex % HISTORICAL_DATA_LENGTH
+      : naiveIndex;
+
+    if (!this.useCyclicData && dataIndex >= HISTORICAL_DATA_LENGTH) {
+      console.error('Historical data index exceeded available range', { startYear, yearIndex, dataIndex });
+      return { stockReturn: 0, cryptoReturn: 0, inflationRate: 0.02 };
+    }
+
     const stockData = getStockData(this.stockRegion);
     const inflationData = getInflationData(this.inflationRegion);
 
@@ -332,6 +340,19 @@ const runSingleSimulation = (
 /**
  * 複数のシミュレーション結果を統計処理してチャートデータに変換します
  */
+const calculatePercentileValue = (sortedValues: number[], percentile: number): number => {
+  if (sortedValues.length === 0) {
+    return 0;
+  }
+  if (sortedValues.length === 1) {
+    return sortedValues[0];
+  }
+
+  const clampedPercentile = Math.min(Math.max(percentile, 0), 1);
+  const index = Math.floor((sortedValues.length - 1) * clampedPercentile);
+  return sortedValues[index];
+};
+
 const processSimulationResults = (
   allSimulations: number[][],
   allStockSimulations: number[][],
@@ -362,19 +383,24 @@ const processSimulationResults = (
     const yearData: YearlyData = {
       year: year,
       age: params.initialAge + year,
-      median: yearlyOutcomes[Math.floor(numSims / 2)] || 0,
-      p90: yearlyOutcomes[Math.floor(numSims * 0.9)] || 0,
-      p75: yearlyOutcomes[Math.floor(numSims * 0.75)] || 0,
-      p25: yearlyOutcomes[Math.floor(numSims * 0.25)] || 0,
-      p10: yearlyOutcomes[Math.floor(numSims * 0.1)] || 0,
-      medianStock: yearlyStockOutcomes[Math.floor(yearlyStockOutcomes.length / 2)] || 0,
-      medianCrypto: yearlyCryptoOutcomes[Math.floor(yearlyCryptoOutcomes.length / 2)] || 0,
-      medianCash: yearlyCashOutcomes[Math.floor(yearlyCashOutcomes.length / 2)] || 0,
+      median: calculatePercentileValue(yearlyOutcomes, 0.5),
+      p90: calculatePercentileValue(yearlyOutcomes, 0.9),
+      p75: calculatePercentileValue(yearlyOutcomes, 0.75),
+      p25: calculatePercentileValue(yearlyOutcomes, 0.25),
+      p10: calculatePercentileValue(yearlyOutcomes, 0.1),
+      medianStock: calculatePercentileValue(yearlyStockOutcomes, 0.5),
+      medianCrypto: calculatePercentileValue(yearlyCryptoOutcomes, 0.5),
+      medianCash: calculatePercentileValue(yearlyCashOutcomes, 0.5),
     };
     chartData.push(yearData);
   }
 
   return chartData;
+};
+
+export const __simulationTestUtils = {
+  calculatePercentileValue,
+  processSimulationResults,
 };
 
 /**
@@ -429,15 +455,21 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
     console.warn(validation.message);
   }
 
+  const simulationPeriod = params.endAge - params.initialAge;
+  const useCyclicData = simulationPeriod >= HISTORICAL_DATA_LENGTH;
   const returnCalculator = new HistoricalReturnCalculator(
     params.stockRegion || 'sp500',
-    params.inflationRegion || 'japan'
+    params.inflationRegion || 'japan',
+    useCyclicData
   );
-  const simulationPeriod = params.endAge - params.initialAge;
-  const actualStartYears = calculateHistoricalSimulationCount(simulationPeriod);
+  const availableStartCount = useCyclicData
+    ? HISTORICAL_DATA_LENGTH
+    : Math.max(1, HISTORICAL_DATA_LENGTH - simulationPeriod + 1);
+  const desiredSimulationCount = calculateHistoricalSimulationCount(simulationPeriod);
+  const actualStartYears = Math.min(desiredSimulationCount, availableStartCount);
 
-  // 0〜(HISTORICAL_DATA_LENGTH-1)の配列を作り、シャッフルして先頭からactualStartYears個を使う
-  const startYearCandidates = Array.from({ length: HISTORICAL_DATA_LENGTH }, (_, i) => i);
+  // 利用可能な開始年（循環しない期間では末尾を超えない範囲に限定）をシャッフル
+  const startYearCandidates = Array.from({ length: availableStartCount }, (_, i) => i);
   for (let i = startYearCandidates.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [startYearCandidates[i], startYearCandidates[j]] = [startYearCandidates[j], startYearCandidates[i]];
@@ -445,7 +477,7 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
   const selectedStartYears = startYearCandidates.slice(0, actualStartYears);
 
   console.log(`Running ${actualStartYears} simulations for ${simulationPeriod} years`);
-  if (simulationPeriod > HISTORICAL_DATA_LENGTH) {
+  if (useCyclicData) {
     console.log(`Using cyclic historical data (${HISTORICAL_DATA_LENGTH} years repeated)`);
   }
 
