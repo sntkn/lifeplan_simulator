@@ -5,7 +5,7 @@
 import { AIAdvisorService, getDefaultAIConfig, saveAIConfig, type AIConfig } from '../services/aiAdvisor';
 import type { SimulationParams, YearlyData } from '../types/simulation';
 
-global.fetch = jest.fn();
+globalThis.fetch = jest.fn();
 
 const mockParams: SimulationParams = {
   initialAge: 30,
@@ -74,7 +74,7 @@ describe('AIAdvisorService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
-    (global.fetch as jest.Mock).mockClear();
+    (globalThis.fetch as jest.Mock).mockClear();
   });
 
   describe('Ollama Provider', () => {
@@ -93,7 +93,7 @@ describe('AIAdvisorService', () => {
         confidence: 0.85
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (globalThis.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({ response: JSON.stringify(mockResponse) })
       });
@@ -102,7 +102,7 @@ describe('AIAdvisorService', () => {
       const result = await service.generateAdvice(mockParams, mockResults);
 
       expect(result).toEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         'http://localhost:11434/api/generate',
         expect.objectContaining({
           method: 'POST'
@@ -116,7 +116,7 @@ describe('AIAdvisorService', () => {
         model: 'llama3'
       };
 
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Connection failed'));
+      (globalThis.fetch as jest.Mock).mockRejectedValue(new Error('Connection failed'));
 
       const service = new AIAdvisorService(config);
       const result = await service.generateAdvice(mockParams, mockResults);
@@ -131,7 +131,7 @@ describe('AIAdvisorService', () => {
         model: 'llama3'
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (globalThis.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({ response: 'invalid json' })
       });
@@ -159,7 +159,7 @@ describe('AIAdvisorService', () => {
         confidence: 0.85
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (globalThis.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({
           choices: [{
@@ -174,7 +174,7 @@ describe('AIAdvisorService', () => {
       const result = await service.generateAdvice(mockParams, mockResults);
 
       expect(result).toEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         'https://api.openai.com/v1/chat/completions',
         expect.objectContaining({
           method: 'POST',
@@ -192,7 +192,7 @@ describe('AIAdvisorService', () => {
         apiKey: 'test-key'
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (globalThis.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 401
       });
@@ -220,7 +220,7 @@ describe('AIAdvisorService', () => {
         confidence: 0.85
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (globalThis.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({
           candidates: [{
@@ -246,7 +246,7 @@ describe('AIAdvisorService', () => {
         apiKey: 'test-key'
       };
 
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('API Error'));
+      (globalThis.fetch as jest.Mock).mockRejectedValue(new Error('API Error'));
 
       const service = new AIAdvisorService(config);
       const result = await service.generateAdvice(mockParams, mockResults);
@@ -310,7 +310,7 @@ describe('AIAdvisorService', () => {
         model: 'llama3'
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (globalThis.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({ response: '{}' })
       });
@@ -318,7 +318,7 @@ describe('AIAdvisorService', () => {
       const service = new AIAdvisorService(config);
       await service.generateAdvice(mockParams, mockResults);
 
-      const callArgs = (global.fetch as jest.Mock).mock.calls[0][1];
+      const callArgs = (globalThis.fetch as jest.Mock).mock.calls[0][1];
       const body = JSON.parse(callArgs.body);
       expect(body.prompt).toContain('モンテカルロ法');
     });
@@ -330,7 +330,7 @@ describe('AIAdvisorService', () => {
         model: 'llama3'
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (globalThis.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({ response: '{}' })
       });
@@ -338,7 +338,7 @@ describe('AIAdvisorService', () => {
       const service = new AIAdvisorService(config);
       await service.generateAdvice(historicalParams, mockResults);
 
-      const callArgs = (global.fetch as jest.Mock).mock.calls[0][1];
+      const callArgs = (globalThis.fetch as jest.Mock).mock.calls[0][1];
       const body = JSON.parse(callArgs.body);
       expect(body.prompt).toContain('ヒストリカル法');
     });
