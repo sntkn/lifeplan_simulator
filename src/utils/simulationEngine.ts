@@ -159,7 +159,7 @@ const runSingleSimulation = (
     cryptoValue *= (1 + cryptoReturn);
 
     // Income calculation
-    const currentSalary = currentAge <= params.retirementAge ? salary : 0;
+    const currentSalary = currentAge < params.retirementAge ? salary : 0;
     const income = currentSalary + currentRealEstateIncome;
 
     // Expenses calculation
@@ -340,6 +340,19 @@ const runSingleSimulation = (
 /**
  * 複数のシミュレーション結果を統計処理してチャートデータに変換します
  */
+const calculatePercentileValue = (sortedValues: number[], percentile: number): number => {
+  if (sortedValues.length === 0) {
+    return 0;
+  }
+  if (sortedValues.length === 1) {
+    return sortedValues[0];
+  }
+
+  const clampedPercentile = Math.min(Math.max(percentile, 0), 1);
+  const index = Math.floor((sortedValues.length - 1) * clampedPercentile);
+  return sortedValues[index];
+};
+
 const processSimulationResults = (
   allSimulations: number[][],
   allStockSimulations: number[][],
@@ -370,19 +383,24 @@ const processSimulationResults = (
     const yearData: YearlyData = {
       year: year,
       age: params.initialAge + year,
-      median: yearlyOutcomes[Math.floor(numSims / 2)] || 0,
-      p90: yearlyOutcomes[Math.floor(numSims * 0.9)] || 0,
-      p75: yearlyOutcomes[Math.floor(numSims * 0.75)] || 0,
-      p25: yearlyOutcomes[Math.floor(numSims * 0.25)] || 0,
-      p10: yearlyOutcomes[Math.floor(numSims * 0.1)] || 0,
-      medianStock: yearlyStockOutcomes[Math.floor(yearlyStockOutcomes.length / 2)] || 0,
-      medianCrypto: yearlyCryptoOutcomes[Math.floor(yearlyCryptoOutcomes.length / 2)] || 0,
-      medianCash: yearlyCashOutcomes[Math.floor(yearlyCashOutcomes.length / 2)] || 0,
+      median: calculatePercentileValue(yearlyOutcomes, 0.5),
+      p90: calculatePercentileValue(yearlyOutcomes, 0.9),
+      p75: calculatePercentileValue(yearlyOutcomes, 0.75),
+      p25: calculatePercentileValue(yearlyOutcomes, 0.25),
+      p10: calculatePercentileValue(yearlyOutcomes, 0.1),
+      medianStock: calculatePercentileValue(yearlyStockOutcomes, 0.5),
+      medianCrypto: calculatePercentileValue(yearlyCryptoOutcomes, 0.5),
+      medianCash: calculatePercentileValue(yearlyCashOutcomes, 0.5),
     };
     chartData.push(yearData);
   }
 
   return chartData;
+};
+
+export const __simulationTestUtils = {
+  calculatePercentileValue,
+  processSimulationResults,
 };
 
 /**
