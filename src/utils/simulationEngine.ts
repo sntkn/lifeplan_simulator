@@ -159,7 +159,7 @@ const runSingleSimulation = (
     cryptoValue *= (1 + cryptoReturn);
 
     // Income calculation
-    const currentSalary = currentAge < params.retirementAge ? salary : 0;
+    const currentSalary = currentAge <= params.retirementAge ? salary : 0;
     const income = currentSalary + currentRealEstateIncome;
 
     // Expenses calculation
