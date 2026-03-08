@@ -24,7 +24,7 @@ export const AssetChart = ({ data }: AssetChartProps) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="age" name="年齢" />
           <YAxis tickFormatter={formatYAxis} />
-          <Tooltip formatter={(value: number) => `${Math.floor(value / 10000).toLocaleString()}万円`} />
+          <Tooltip formatter={(value) => typeof value === 'number' ? `${Math.floor(value / 10000).toLocaleString()}万円` : ''} />
           <Legend />
           <Line type="monotone" dataKey="median" stroke="#8884d8" name="資産額中央値" dot={false} strokeWidth={2} />
           <Line type="monotone" dataKey="p90" stroke="#82ca9d" name="上位10%" dot={false} />

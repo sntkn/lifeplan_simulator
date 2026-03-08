@@ -25,7 +25,7 @@ export const AssetBreakdownChart = ({ data }: AssetBreakdownChartProps) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="age" name="年齢" />
           <YAxis tickFormatter={formatYAxis} />
-          <Tooltip formatter={(value: number) => `${Math.floor(value / 10000).toLocaleString()}万円`} />
+          <Tooltip formatter={(value) => typeof value === 'number' ? `${Math.floor(value / 10000).toLocaleString()}万円` : ''} />
           <Legend />
           <Line type="monotone" dataKey="medianCash" stroke="#ff7300" name="現金" dot={false} strokeWidth={2} />
           <Line type="monotone" dataKey="medianCrypto" stroke="#00c49f" name="仮想通貨" dot={false} strokeWidth={2} />
