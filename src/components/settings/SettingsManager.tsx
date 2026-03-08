@@ -105,7 +105,11 @@ export const SettingsManager = ({ params, onLoadSetting }: SettingsManagerProps)
    * 設定を読み込みます
    */
   const handleLoadSetting = (setting: SavedSetting) => {
-    onLoadSetting(setting.params);
+    const normalizedParams: SimulationParams = {
+      ...setting.params,
+      cashOverflowPriority: setting.params.cashOverflowPriority ?? setting.params.liquidationPriority
+    };
+    onLoadSetting(normalizedParams);
     alert(`設定「${setting.name}」を読み込みました`);
   };
 

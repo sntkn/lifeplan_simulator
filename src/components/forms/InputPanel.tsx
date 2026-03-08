@@ -205,8 +205,19 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
           onChange={(value) => setParams({ ...params, stockLowerLimit: value })}
           unit={JPY_UNIT}
         />
-        <label className="block mb-1 font-bold">現金不足時の優先取り崩し資産</label>
-        <select value={params.liquidationPriority} onChange={e => setParams({ ...params, liquidationPriority: e.target.value as 'crypto' | 'stock' | 'random' })} className="w-full p-2 border rounded box-border">
+        <label htmlFor="cash-overflow-priority" className="block mb-1 font-bold">現金上限に達した場合の積立先</label>
+        <select
+          id="cash-overflow-priority"
+          value={params.cashOverflowPriority}
+          onChange={e => setParams({ ...params, cashOverflowPriority: e.target.value as 'crypto' | 'stock' | 'random' })}
+          className="w-full p-2 border rounded box-border"
+        >
+          <option value="crypto">仮想通貨</option>
+          <option value="stock">株式</option>
+          <option value="random">ランダム</option>
+        </select>
+        <label htmlFor="liquidation-priority" className="block mb-1 font-bold">現金不足時の優先取り崩し資産</label>
+        <select id="liquidation-priority" value={params.liquidationPriority} onChange={e => setParams({ ...params, liquidationPriority: e.target.value as 'crypto' | 'stock' | 'random' })} className="w-full p-2 border rounded box-border">
           <option value="crypto">仮想通貨</option>
           <option value="stock">株式</option>
           <option value="random">ランダム</option>

@@ -27,6 +27,7 @@ const mockParams: SimulationParams = {
   cryptoLowerLimit: 0,
   stockLowerLimit: 0,
   liquidationPriority: 'crypto',
+  cashOverflowPriority: 'crypto',
   retirementAge: 60,
   loanDuration: 30,
   medicalCareStartAge: 65,

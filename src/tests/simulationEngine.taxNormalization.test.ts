@@ -21,6 +21,7 @@ const baseParams = (overrides: Partial<SimulationParams> = {}): SimulationParams
   cryptoLowerLimit: 0,
   stockLowerLimit: 0,
   liquidationPriority: 'stock',
+  cashOverflowPriority: 'stock',
   initialStockValue: 100000,
   initialCryptoValue: 0,
   initialCashValue: 0,

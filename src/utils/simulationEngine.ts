@@ -130,6 +130,8 @@ const runSingleSimulation = (
     stockLowerLimit,
     stockTaxRate,
     cryptoTaxRate,
+    liquidationPriority,
+    cashOverflowPriority,
   } = params;
 
   const simulationPeriod = params.endAge - initialAge;
@@ -181,7 +183,9 @@ const runSingleSimulation = (
     if (cashValue > cashUpperLimit) {
       const surplus = cashValue - cashUpperLimit;
 
-      switch (params.liquidationPriority) {
+      const overflowPriority = cashOverflowPriority ?? liquidationPriority;
+
+      switch (overflowPriority) {
         case 'crypto':
           cryptoValue += surplus;
           break;
@@ -261,7 +265,7 @@ const runSingleSimulation = (
         deficit -= cashGained;
       };
 
-      switch (params.liquidationPriority) {
+      switch (liquidationPriority) {
         case 'crypto':
           liquidate('crypto');
           liquidate('stock');

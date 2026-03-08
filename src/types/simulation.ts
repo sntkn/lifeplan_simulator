@@ -45,6 +45,8 @@ export type SimulationParams = {
   stockLowerLimit: number;
   /** 現金が下限を下回った場合に取り崩す資産の優先順位 */
   liquidationPriority: 'crypto' | 'stock' | 'random';
+  /** 現金が上限を超えた際に積み立てる資産の優先順位 */
+  cashOverflowPriority: 'crypto' | 'stock' | 'random';
 
   /** 初期資産（株式） */
   initialStockValue: number;

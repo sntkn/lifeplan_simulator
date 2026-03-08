@@ -24,6 +24,7 @@ const mockParams: SimulationParams = {
   cryptoLowerLimit: 0,
   stockLowerLimit: 0,
   liquidationPriority: 'crypto',
+  cashOverflowPriority: 'crypto',
   retirementAge: 60,
   loanDuration: 30,
   medicalCareStartAge: 65,
@@ -66,7 +67,7 @@ describe('InputPanel Additional Coverage', () => {
 
   test('handles liquidation priority change to stock', () => {
     render(<InputPanel params={mockParams} setParams={mockSetParams} onSimulate={mockOnSimulate} />);
-    const select = screen.getByDisplayValue('仮想通貨');
+    const select = screen.getByLabelText('現金不足時の優先取り崩し資産');
 
     fireEvent.change(select, { target: { value: 'stock' } });
 
@@ -77,12 +78,23 @@ describe('InputPanel Additional Coverage', () => {
 
   test('handles liquidation priority change to random', () => {
     render(<InputPanel params={mockParams} setParams={mockSetParams} onSimulate={mockOnSimulate} />);
-    const select = screen.getByDisplayValue('仮想通貨');
+    const select = screen.getByLabelText('現金不足時の優先取り崩し資産');
 
     fireEvent.change(select, { target: { value: 'random' } });
 
     expect(mockSetParams).toHaveBeenCalledWith(expect.objectContaining({
       liquidationPriority: 'random'
+    }));
+  });
+
+  test('handles cash overflow priority change independently', () => {
+    render(<InputPanel params={mockParams} setParams={mockSetParams} onSimulate={mockOnSimulate} />);
+    const select = screen.getByLabelText('現金上限に達した場合の積立先');
+
+    fireEvent.change(select, { target: { value: 'stock' } });
+
+    expect(mockSetParams).toHaveBeenCalledWith(expect.objectContaining({
+      cashOverflowPriority: 'stock'
     }));
   });
 
