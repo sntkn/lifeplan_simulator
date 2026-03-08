@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { SimulationParams, SavedSetting } from '../../types/simulation';
 
 // --- Settings Management Logic ---
@@ -70,21 +70,14 @@ interface SettingsManagerProps {
  */
 export const SettingsManager = ({ params, onLoadSetting }: SettingsManagerProps) => {
   /**
-   * 保存された設定一覧の状態
-   */
-  const [savedSettings, setSavedSettings] = useState<SavedSetting[]>([]);
-
-  /**
    * 設定保存用の名前入力の状態
    */
   const [saveSettingName, setSaveSettingName] = useState('');
 
   /**
-   * コンポーネント初期化時に保存された設定を読み込み
+   * 保存された設定一覧の状態（初期化時にローカルストレージから読み込み）
    */
-  useEffect(() => {
-    setSavedSettings(getSavedSettings());
-  }, []);
+  const [savedSettings, setSavedSettings] = useState<SavedSetting[]>(() => getSavedSettings());
 
   /**
    * 設定を保存します
