@@ -379,7 +379,6 @@ const processSimulationResults = (
     yearlyCryptoOutcomes.sort((a, b) => a - b);
     yearlyCashOutcomes.sort((a, b) => a - b);
 
-    const numSims = yearlyOutcomes.length;
     const yearData: YearlyData = {
       year: year,
       age: params.initialAge + year,
