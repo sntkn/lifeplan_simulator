@@ -79,23 +79,20 @@ export class AIAdvisorService {
     };
 
     // シミュレーション設定の表示内容を条件分岐
-    let simulationSettings = '';
-    if (params.simulationMethod === 'montecarlo') {
-      simulationSettings = `
+    const simulationSettings = params.simulationMethod === 'montecarlo'
+      ? `
 【シミュレーション設定】
 - シミュレーション方法: ${simulationMethodName}
 - 実行回数: ${params.numSimulations}回
 - インフレ率: ${(params.inflationRate * 100).toFixed(1)}%
 - 株式期待リターン: ${(params.investmentReturnRate * 100).toFixed(1)}%
-- 仮想通貨期待リターン: ${(params.cryptoReturnRate * 100).toFixed(1)}%`;
-    } else {
-      simulationSettings = `
+- 仮想通貨期待リターン: ${(params.cryptoReturnRate * 100).toFixed(1)}%`
+      : `
 【シミュレーション設定】
 - シミュレーション方法: ${simulationMethodName}
 - インフレ率地域: ${getRegionName(params.inflationRegion)}の過去データを使用
 - 株式リターン地域: ${getRegionName(params.stockRegion)}の過去データを使用
 - 実行回数: ${params.numSimulations}回（モンテカルロ法に基づく）`;
-    }
 
     return `
 あなたは経験豊富な日本のファイナンシャルプランナーです。以下のライフプランシミュレーション結果を分析し、日本語で具体的で実用的なアドバイスを提供してください。
