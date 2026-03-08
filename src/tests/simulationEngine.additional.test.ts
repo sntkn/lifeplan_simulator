@@ -25,6 +25,7 @@ const baseParams: SimulationParams = {
   cryptoLowerLimit: 0,
   stockLowerLimit: 0,
   liquidationPriority: 'crypto',
+  cashOverflowPriority: 'crypto',
   initialStockValue: 5000000,
   initialCryptoValue: 1000000,
   initialCashValue: 2000000,
@@ -46,6 +47,7 @@ describe('Simulation Engine Additional Coverage', () => {
     const params = {
       ...baseParams,
       liquidationPriority: 'random' as const,
+      cashOverflowPriority: 'random' as const,
       initialCashValue: 15000000,
       cashUpperLimit: 10000000,
       stockLowerLimit: 1000000,
@@ -61,6 +63,7 @@ describe('Simulation Engine Additional Coverage', () => {
     const params = {
       ...baseParams,
       liquidationPriority: 'random' as const,
+      cashOverflowPriority: 'random' as const,
       initialCashValue: 15000000,
       cashUpperLimit: 10000000,
       stockLowerLimit: 1000000,
@@ -76,6 +79,7 @@ describe('Simulation Engine Additional Coverage', () => {
     const params = {
       ...baseParams,
       liquidationPriority: 'random' as const,
+      cashOverflowPriority: 'random' as const,
       initialCashValue: 15000000,
       cashUpperLimit: 10000000,
       stockLowerLimit: 5000000,
@@ -91,6 +95,7 @@ describe('Simulation Engine Additional Coverage', () => {
     const params = {
       ...baseParams,
       liquidationPriority: 'random' as const,
+      cashOverflowPriority: 'random' as const,
       initialCashValue: 15000000,
       cashUpperLimit: 10000000,
       stockLowerLimit: 5000000,

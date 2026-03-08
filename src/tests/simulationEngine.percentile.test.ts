@@ -23,6 +23,7 @@ const baseParams: SimulationParams = {
   cryptoLowerLimit: 0,
   stockLowerLimit: 0,
   liquidationPriority: 'crypto',
+  cashOverflowPriority: 'crypto',
   initialStockValue: 0,
   initialCryptoValue: 0,
   initialCashValue: 0,

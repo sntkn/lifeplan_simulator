@@ -29,6 +29,7 @@ export const useSimulation = () => {
     cryptoLowerLimit: 5000000,
     stockLowerLimit: 5000000,
     liquidationPriority: 'crypto',
+    cashOverflowPriority: 'crypto',
     initialStockValue: 0,
     initialCryptoValue: 0,
     initialCashValue: 5000000,
