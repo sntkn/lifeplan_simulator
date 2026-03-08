@@ -86,7 +86,7 @@ export const AIAdvisorPanel = ({ params, simulationData }: AIAdvisorPanelProps) 
               <label className="block text-sm font-medium mb-1">AIプロバイダー</label>
               <select
                 value={config.provider}
-                onChange={(e) => updateConfig({ provider: e.target.value as any })}
+                onChange={(e) => updateConfig({ provider: e.target.value as AIConfig['provider'] })}
                 className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
               >
                 <option value="ollama">Ollama (無料・ローカル)</option>
