@@ -192,7 +192,7 @@ const runSingleSimulation = (
         case 'stock':
           stockValue += surplus;
           break;
-        default: // random
+        default: { // random
           const stockAboveLowerLimit = stockValue >= stockLowerLimit;
           const cryptoAboveLowerLimit = cryptoValue >= cryptoLowerLimit;
 
@@ -214,6 +214,7 @@ const runSingleSimulation = (
             stockValue += surplus;
           }
           break;
+        }
       }
       cashValue = cashUpperLimit;
     }
@@ -274,7 +275,7 @@ const runSingleSimulation = (
           liquidate('stock');
           liquidate('crypto');
           break;
-        default: // random
+        default: { // random
           const stockAboveLowerLimit = stockValue > stockLowerLimit;
           const cryptoAboveLowerLimit = cryptoValue > cryptoLowerLimit;
 
@@ -296,6 +297,7 @@ const runSingleSimulation = (
           }
           // 両方とも下限以下の場合は何もしない
           break;
+        }
       }
     }
 

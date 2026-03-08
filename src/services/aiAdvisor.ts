@@ -49,7 +49,7 @@ export class AIAdvisorService {
       case 'gemini':
         return this.callGemini(prompt);
       case 'local':
-        return this.callLocalModel(prompt);
+        return this.callLocalModel();
       default:
         throw new Error(`Unsupported AI provider: ${this.config.provider}`);
     }
@@ -302,7 +302,7 @@ ${simulationSettings}
   /**
    * ローカルモデルを呼び出し（簡易実装）
    */
-  private async callLocalModel(_prompt: string): Promise<AIAdvice> {
+  private async callLocalModel(): Promise<AIAdvice> {
     // 実際の実装では、Hugging Face Transformers.jsなどを使用
     // ここでは簡易的なルールベースの分析を実装
     return this.getFallbackAdvice();
