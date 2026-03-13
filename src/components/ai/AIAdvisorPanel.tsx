@@ -16,6 +16,13 @@ export const AIAdvisorPanel = ({ params, simulationData }: AIAdvisorPanelProps) 
   const [error, setError] = useState<string | null>(null);
   const [config, setConfig] = useState<AIConfig>(getDefaultAIConfig());
   const [showSettings, setShowSettings] = useState(false);
+  const providerModelPlaceholders: Record<AIConfig['provider'], string> = {
+    ollama: 'llama3.1:8b',
+    openai: 'gpt-4o-mini',
+    gemini: 'gemini-1.5-flash',
+    local: 'custom-gguf'
+  };
+  const modelPlaceholder = providerModelPlaceholders[config.provider] || 'llama3.1:8b';
 
   /**
    * AIアドバイスを生成
@@ -102,7 +109,7 @@ export const AIAdvisorPanel = ({ params, simulationData }: AIAdvisorPanelProps) 
                 type="text"
                 value={config.model}
                 onChange={(e) => updateConfig({ model: e.target.value })}
-                placeholder={config.provider === 'ollama' ? 'llama3' : 'gpt-3.5-turbo'}
+                placeholder={modelPlaceholder}
                 className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
               />
             </div>
@@ -140,15 +147,15 @@ export const AIAdvisorPanel = ({ params, simulationData }: AIAdvisorPanelProps) 
               <div>
                 <p>💡 Ollamaを使用するには、事前にインストールが必要です。</p>
                 <p>インストール: <code>curl -fsSL https://ollama.com/install.sh | sh</code></p>
-                <p>モデルダウンロード: <code>ollama pull llama3</code></p>
-                <p className="text-xs mt-1">※ llama3.2:3bやgemma2:2bなど軽量モデルも利用可能</p>
+                <p>モデルダウンロード: <code>ollama pull llama3.1:8b</code></p>
+                <p className="text-xs mt-1">※ llama3.2:3bやgemma2:2b、phi3.5-mini など軽量GGUFも利用できます</p>
               </div>
             )}
             {config.provider === 'openai' && (
-              <p>💡 OpenAI APIキーが必要です。新規ユーザーには$5のクレジットが提供されます。</p>
+              <p>💡 OpenAI APIキーが必要です。2025年以降は従量課金制のみのため、<code>gpt-4o-mini</code>や<code>o4-mini</code>など最新モデル名を入力してください。</p>
             )}
             {config.provider === 'gemini' && (
-              <p>💡 Google AI StudioでAPIキーを取得してください。月15リクエスト/分まで無料です。</p>
+              <p>💡 Google AI StudioでAPIキーを取得してください。推奨モデルは<code>gemini-1.5-flash</code>もしくは<code>gemini-1.5-pro</code>です。</p>
             )}
           </div>
         </div>

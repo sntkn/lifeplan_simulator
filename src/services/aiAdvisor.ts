@@ -113,6 +113,9 @@ ${simulationSettings}
 - 年間娯楽費: ${params.entertainmentExpenses.toLocaleString()}円
 - 年間住宅維持費: ${params.housingMaintenance.toLocaleString()}円
 - 年間医療・介護費: ${params.medicalCare.toLocaleString()}円
+- 住宅ローン年間返済額: ${params.housingLoan.toLocaleString()}円
+- 住宅ローン残期間: 約${params.loanDuration}年
+- 不動産収入: ${params.realEstateIncome.toLocaleString()}円
 
 【資産配分の推移】
 ■初期時点（${initialResult.age}歳）
@@ -340,10 +343,10 @@ export const getDefaultAIConfig = (): AIConfig => {
     return JSON.parse(savedConfig);
   }
 
-  // デフォルトはOllamaのllama3を使用
+  // デフォルトはOllamaのllama3.1:8bを使用
   return {
     provider: 'ollama',
-    model: 'llama3',
+    model: 'llama3.1:8b',
     endpoint: 'http://localhost:11434'
   };
 };

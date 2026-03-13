@@ -68,7 +68,7 @@ describe('AIAdvisorPanel Component', () => {
     localStorage.clear();
     (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
       provider: 'ollama',
-      model: 'llama3',
+      model: 'llama3.1:8b',
       endpoint: 'http://localhost:11434'
     });
   });

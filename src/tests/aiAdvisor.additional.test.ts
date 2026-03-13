@@ -80,7 +80,7 @@ describe('AI Advisor Service Additional Coverage', () => {
   test('builds prompt with historical method and different regions', async () => {
     const config: AIConfig = {
       provider: 'ollama',
-      model: 'llama3'
+      model: 'llama3.1:8b'
     };
 
     (global.fetch as jest.Mock).mockResolvedValue({
@@ -102,7 +102,7 @@ describe('AI Advisor Service Additional Coverage', () => {
     const worldParams = { ...mockParams, stockRegion: 'world' as const };
     const config: AIConfig = {
       provider: 'ollama',
-      model: 'llama3'
+      model: 'llama3.1:8b'
     };
 
     (global.fetch as jest.Mock).mockResolvedValue({
@@ -122,7 +122,7 @@ describe('AI Advisor Service Additional Coverage', () => {
     const worldParams = { ...mockParams, inflationRegion: 'world' as const };
     const config: AIConfig = {
       provider: 'ollama',
-      model: 'llama3'
+      model: 'llama3.1:8b'
     };
 
     (global.fetch as jest.Mock).mockResolvedValue({
