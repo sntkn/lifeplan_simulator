@@ -68,7 +68,7 @@ describe('AIAdvisorPanel Additional Coverage', () => {
     localStorage.clear();
     (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
       provider: 'ollama',
-      model: 'llama3',
+      model: 'llama3.1:8b',
       endpoint: 'http://localhost:11434'
     });
   });
@@ -85,7 +85,7 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   test('shows API key field when provider is openai', () => {
     (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
       provider: 'openai',
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       apiKey: ''
     });
 
@@ -100,7 +100,7 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   test('shows API key field when provider is gemini', () => {
     (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
       provider: 'gemini',
-      model: 'gemini-pro',
+      model: 'gemini-1.5-flash',
       apiKey: ''
     });
 
@@ -120,8 +120,8 @@ describe('AIAdvisorPanel Additional Coverage', () => {
     const settingsButton = screen.getByText('設定');
     fireEvent.click(settingsButton);
 
-    const modelInput = screen.getByPlaceholderText('llama3');
-    fireEvent.change(modelInput, { target: { value: 'llama3.2' } });
+    const modelInput = screen.getByPlaceholderText('llama3.1:8b');
+    fireEvent.change(modelInput, { target: { value: 'llama3.2:3b' } });
 
     expect(mockSaveAIConfig).toHaveBeenCalled();
   });
@@ -144,7 +144,7 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   test('updates API key config', () => {
     (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
       provider: 'openai',
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       apiKey: ''
     });
 

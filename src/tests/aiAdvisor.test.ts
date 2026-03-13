@@ -82,7 +82,7 @@ describe('AIAdvisorService', () => {
     test('calls Ollama API successfully', async () => {
       const config: AIConfig = {
         provider: 'ollama',
-        model: 'llama3',
+        model: 'llama3.1:8b',
         endpoint: 'http://localhost:11434'
       };
 
@@ -114,7 +114,7 @@ describe('AIAdvisorService', () => {
     test('returns fallback on Ollama API error', async () => {
       const config: AIConfig = {
         provider: 'ollama',
-        model: 'llama3'
+        model: 'llama3.1:8b'
       };
 
       (globalThis.fetch as jest.Mock).mockRejectedValue(new Error('Connection failed'));
@@ -129,7 +129,7 @@ describe('AIAdvisorService', () => {
     test('returns fallback on invalid JSON response', async () => {
       const config: AIConfig = {
         provider: 'ollama',
-        model: 'llama3'
+        model: 'llama3.1:8b'
       };
 
       (globalThis.fetch as jest.Mock).mockResolvedValue({
@@ -148,7 +148,7 @@ describe('AIAdvisorService', () => {
     test('calls OpenAI API successfully', async () => {
       const config: AIConfig = {
         provider: 'openai',
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         apiKey: 'test-key'
       };
 
@@ -189,7 +189,7 @@ describe('AIAdvisorService', () => {
     test('returns fallback on OpenAI API error', async () => {
       const config: AIConfig = {
         provider: 'openai',
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         apiKey: 'test-key'
       };
 
@@ -209,7 +209,7 @@ describe('AIAdvisorService', () => {
     test('calls Gemini API successfully', async () => {
       const config: AIConfig = {
         provider: 'gemini',
-        model: 'gemini-pro',
+        model: 'gemini-1.5-flash',
         apiKey: 'test-key'
       };
 
@@ -243,7 +243,7 @@ describe('AIAdvisorService', () => {
     test('returns fallback on Gemini API error', async () => {
       const config: AIConfig = {
         provider: 'gemini',
-        model: 'gemini-pro',
+        model: 'gemini-1.5-flash',
         apiKey: 'test-key'
       };
 
@@ -275,7 +275,7 @@ describe('AIAdvisorService', () => {
     test('getDefaultAIConfig returns default config', () => {
       const config = getDefaultAIConfig();
       expect(config.provider).toBe('ollama');
-      expect(config.model).toBe('llama3');
+      expect(config.model).toBe('llama3.1:8b');
     });
 
     test('getDefaultAIConfig loads from localStorage', () => {
@@ -293,7 +293,7 @@ describe('AIAdvisorService', () => {
     test('saveAIConfig saves to localStorage', () => {
       const config: AIConfig = {
         provider: 'gemini',
-        model: 'gemini-pro',
+        model: 'gemini-1.5-flash',
         apiKey: 'test-key'
       };
 
@@ -308,7 +308,7 @@ describe('AIAdvisorService', () => {
     test('builds prompt with monte carlo method', async () => {
       const config: AIConfig = {
         provider: 'ollama',
-        model: 'llama3'
+        model: 'llama3.1:8b'
       };
 
       (globalThis.fetch as jest.Mock).mockResolvedValue({
@@ -328,7 +328,7 @@ describe('AIAdvisorService', () => {
       const historicalParams = { ...mockParams, simulationMethod: 'historical' as const };
       const config: AIConfig = {
         provider: 'ollama',
-        model: 'llama3'
+        model: 'llama3.1:8b'
       };
 
       (globalThis.fetch as jest.Mock).mockResolvedValue({
