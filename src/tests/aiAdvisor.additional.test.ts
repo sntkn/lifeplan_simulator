@@ -4,8 +4,11 @@
 
 import { AIAdvisorService, type AIConfig } from '../services/aiAdvisor';
 import type { SimulationParams, YearlyData } from '../types/simulation';
+import { vi } from 'vitest';
 
-global.fetch = jest.fn();
+type MockFn = ReturnType<typeof vi.fn>;
+
+globalThis.fetch = vi.fn();
 
 const mockParams: SimulationParams = {
   initialAge: 30,
@@ -73,8 +76,8 @@ const mockResults: YearlyData[] = [
 
 describe('AI Advisor Service Additional Coverage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockClear();
+    vi.clearAllMocks();
+    (globalThis.fetch as MockFn).mockClear();
   });
 
   test('builds prompt with historical method and different regions', async () => {
@@ -83,7 +86,7 @@ describe('AI Advisor Service Additional Coverage', () => {
       model: 'llama3.1:8b'
     };
 
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (globalThis.fetch as MockFn).mockResolvedValue({
       ok: true,
       json: async () => ({ response: '{}' })
     });
@@ -91,7 +94,7 @@ describe('AI Advisor Service Additional Coverage', () => {
     const service = new AIAdvisorService(config);
     await service.generateAdvice(mockParams, mockResults);
 
-    const callArgs = (global.fetch as jest.Mock).mock.calls[0][1];
+    const callArgs = (globalThis.fetch as MockFn).mock.calls[0][1];
     const body = JSON.parse(callArgs.body);
     expect(body.prompt).toContain('ヒストリカル法');
     expect(body.prompt).toContain('日経平均');
@@ -105,7 +108,7 @@ describe('AI Advisor Service Additional Coverage', () => {
       model: 'llama3.1:8b'
     };
 
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (globalThis.fetch as MockFn).mockResolvedValue({
       ok: true,
       json: async () => ({ response: '{}' })
     });
@@ -113,7 +116,7 @@ describe('AI Advisor Service Additional Coverage', () => {
     const service = new AIAdvisorService(config);
     await service.generateAdvice(worldParams, mockResults);
 
-    const callArgs = (global.fetch as jest.Mock).mock.calls[0][1];
+    const callArgs = (globalThis.fetch as MockFn).mock.calls[0][1];
     const body = JSON.parse(callArgs.body);
     expect(body.prompt).toContain('世界');
   });
@@ -125,7 +128,7 @@ describe('AI Advisor Service Additional Coverage', () => {
       model: 'llama3.1:8b'
     };
 
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (globalThis.fetch as MockFn).mockResolvedValue({
       ok: true,
       json: async () => ({ response: '{}' })
     });
@@ -133,7 +136,7 @@ describe('AI Advisor Service Additional Coverage', () => {
     const service = new AIAdvisorService(config);
     await service.generateAdvice(worldParams, mockResults);
 
-    const callArgs = (global.fetch as jest.Mock).mock.calls[0][1];
+    const callArgs = (globalThis.fetch as MockFn).mock.calls[0][1];
     const body = JSON.parse(callArgs.body);
     expect(body.prompt).toContain('世界');
   });

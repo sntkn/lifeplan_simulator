@@ -3,12 +3,15 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { AIAdvisorPanel } from '../components/ai/AIAdvisorPanel';
 import * as aiAdvisor from '../services/aiAdvisor';
 import type { SimulationParams, YearlyData } from '../types/simulation';
+import type { Mock } from 'vitest';
 
-jest.mock('../services/aiAdvisor');
+vi.mock('../services/aiAdvisor');
+
+type MockFn = Mock;
 
 const mockParams: SimulationParams = {
   initialAge: 30,
@@ -64,9 +67,9 @@ const mockSimulationData: YearlyData[] = [
 
 describe('AIAdvisorPanel Additional Coverage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
-    (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
+    (aiAdvisor.getDefaultAIConfig as MockFn).mockReturnValue({
       provider: 'ollama',
       model: 'llama3.1:8b',
       endpoint: 'http://localhost:11434'
@@ -83,7 +86,7 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   });
 
   test('shows API key field when provider is openai', () => {
-    (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
+    (aiAdvisor.getDefaultAIConfig as MockFn).mockReturnValue({
       provider: 'openai',
       model: 'gpt-4o-mini',
       apiKey: ''
@@ -98,7 +101,7 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   });
 
   test('shows API key field when provider is gemini', () => {
-    (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
+    (aiAdvisor.getDefaultAIConfig as MockFn).mockReturnValue({
       provider: 'gemini',
       model: 'gemini-1.5-flash',
       apiKey: ''
@@ -112,8 +115,8 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   });
 
   test('updates model config', () => {
-    const mockSaveAIConfig = jest.fn();
-    (aiAdvisor.saveAIConfig as jest.Mock) = mockSaveAIConfig;
+    const mockSaveAIConfig = vi.fn();
+    (aiAdvisor.saveAIConfig as MockFn) = mockSaveAIConfig;
 
     render(<AIAdvisorPanel params={mockParams} simulationData={mockSimulationData} />);
 
@@ -127,8 +130,8 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   });
 
   test('updates endpoint config for ollama', () => {
-    const mockSaveAIConfig = jest.fn();
-    (aiAdvisor.saveAIConfig as jest.Mock) = mockSaveAIConfig;
+    const mockSaveAIConfig = vi.fn();
+    (aiAdvisor.saveAIConfig as MockFn) = mockSaveAIConfig;
 
     render(<AIAdvisorPanel params={mockParams} simulationData={mockSimulationData} />);
 
@@ -142,14 +145,14 @@ describe('AIAdvisorPanel Additional Coverage', () => {
   });
 
   test('updates API key config', () => {
-    (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
+    (aiAdvisor.getDefaultAIConfig as MockFn).mockReturnValue({
       provider: 'openai',
       model: 'gpt-4o-mini',
       apiKey: ''
     });
 
-    const mockSaveAIConfig = jest.fn();
-    (aiAdvisor.saveAIConfig as jest.Mock) = mockSaveAIConfig;
+    const mockSaveAIConfig = vi.fn();
+    (aiAdvisor.saveAIConfig as MockFn) = mockSaveAIConfig;
 
     render(<AIAdvisorPanel params={mockParams} simulationData={mockSimulationData} />);
 
@@ -171,8 +174,8 @@ describe('AIAdvisorPanel Additional Coverage', () => {
       confidence: 0.95
     };
 
-    const mockGenerateAdvice = jest.fn().mockResolvedValue(mockAdvice);
-    (aiAdvisor.AIAdvisorService as jest.Mock).mockImplementation(() => ({
+    const mockGenerateAdvice = vi.fn().mockResolvedValue(mockAdvice);
+    (aiAdvisor.AIAdvisorService as MockFn).mockImplementation(() => ({
       generateAdvice: mockGenerateAdvice
     }));
 
@@ -195,8 +198,8 @@ describe('AIAdvisorPanel Additional Coverage', () => {
       confidence: 0.65
     };
 
-    const mockGenerateAdvice = jest.fn().mockResolvedValue(mockAdvice);
-    (aiAdvisor.AIAdvisorService as jest.Mock).mockImplementation(() => ({
+    const mockGenerateAdvice = vi.fn().mockResolvedValue(mockAdvice);
+    (aiAdvisor.AIAdvisorService as MockFn).mockImplementation(() => ({
       generateAdvice: mockGenerateAdvice
     }));
 
@@ -219,8 +222,8 @@ describe('AIAdvisorPanel Additional Coverage', () => {
       confidence: 0.45
     };
 
-    const mockGenerateAdvice = jest.fn().mockResolvedValue(mockAdvice);
-    (aiAdvisor.AIAdvisorService as jest.Mock).mockImplementation(() => ({
+    const mockGenerateAdvice = vi.fn().mockResolvedValue(mockAdvice);
+    (aiAdvisor.AIAdvisorService as MockFn).mockImplementation(() => ({
       generateAdvice: mockGenerateAdvice
     }));
 

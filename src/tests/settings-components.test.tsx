@@ -6,11 +6,13 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { SettingsIcon } from '../components/settings/SettingsIcon';
 import { SettingsModal } from '../components/settings/SettingsModal';
 import { SettingsManager } from '../components/settings/SettingsManager';
 import type { SimulationParams } from '../types/simulation';
+
+type MockFn = ReturnType<typeof vi.fn>;
 
 // Mock simulation parameters for testing
 const mockParams: SimulationParams = {
@@ -52,7 +54,7 @@ const mockParams: SimulationParams = {
 
 describe('SettingsIcon Component', () => {
   test('renders gear icon with proper attributes', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     render(<SettingsIcon onClick={mockOnClick} />);
 
     const button = screen.getByRole('button', { name: '設定を開く' });
@@ -62,7 +64,7 @@ describe('SettingsIcon Component', () => {
   });
 
   test('calls onClick when clicked', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     render(<SettingsIcon onClick={mockOnClick} />);
 
     const button = screen.getByRole('button', { name: '設定を開く' });
@@ -72,7 +74,7 @@ describe('SettingsIcon Component', () => {
   });
 
   test('has proper CSS classes for styling', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     render(<SettingsIcon onClick={mockOnClick} />);
 
     const button = screen.getByRole('button', { name: '設定を開く' });
@@ -83,8 +85,8 @@ describe('SettingsIcon Component', () => {
 
 describe('SettingsModal Component', () => {
   test('does not render when isOpen is false', () => {
-    const mockOnClose = jest.fn();
-    const mockOnLoadSetting = jest.fn();
+    const mockOnClose = vi.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsModal
@@ -99,8 +101,8 @@ describe('SettingsModal Component', () => {
   });
 
   test('renders when isOpen is true', () => {
-    const mockOnClose = jest.fn();
-    const mockOnLoadSetting = jest.fn();
+    const mockOnClose = vi.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsModal
@@ -115,8 +117,8 @@ describe('SettingsModal Component', () => {
   });
 
   test('calls onClose when close button is clicked', () => {
-    const mockOnClose = jest.fn();
-    const mockOnLoadSetting = jest.fn();
+    const mockOnClose = vi.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsModal
@@ -134,8 +136,8 @@ describe('SettingsModal Component', () => {
   });
 
   test('calls onClose when ESC key is pressed', () => {
-    const mockOnClose = jest.fn();
-    const mockOnLoadSetting = jest.fn();
+    const mockOnClose = vi.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsModal
@@ -152,8 +154,8 @@ describe('SettingsModal Component', () => {
   });
 
   test('calls onClose when background overlay is clicked', () => {
-    const mockOnClose = jest.fn();
-    const mockOnLoadSetting = jest.fn();
+    const mockOnClose = vi.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsModal
@@ -176,11 +178,11 @@ describe('SettingsModal Component', () => {
 describe('SettingsManager Component', () => {
   beforeEach(() => {
     localStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders save settings section', () => {
-    const mockOnLoadSetting = jest.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsManager
@@ -195,7 +197,7 @@ describe('SettingsManager Component', () => {
   });
 
   test('shows "no saved settings" message when localStorage is empty', () => {
-    const mockOnLoadSetting = jest.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsManager
@@ -208,7 +210,7 @@ describe('SettingsManager Component', () => {
   });
 
   test('saves setting when valid name is provided', async () => {
-    const mockOnLoadSetting = jest.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsManager
@@ -234,7 +236,7 @@ describe('SettingsManager Component', () => {
   });
 
   test('shows error when trying to save with empty name', async () => {
-    const mockOnLoadSetting = jest.fn();
+    const mockOnLoadSetting = vi.fn();
 
     render(
       <SettingsManager
@@ -252,7 +254,7 @@ describe('SettingsManager Component', () => {
   });
 
   test('loads setting when load button is clicked', async () => {
-    const mockOnLoadSetting = jest.fn();
+    const mockOnLoadSetting = vi.fn();
 
     // Pre-populate localStorage with a setting
     const testSetting = {
@@ -279,7 +281,7 @@ describe('SettingsManager Component', () => {
   });
 
   test('deletes setting when delete button is clicked and confirmed', async () => {
-    const mockOnLoadSetting = jest.fn();
+    const mockOnLoadSetting = vi.fn();
 
     // Pre-populate localStorage with a setting
     const testSetting = {
@@ -290,7 +292,7 @@ describe('SettingsManager Component', () => {
     localStorage.setItem('lifeplan-simulator-settings', JSON.stringify([testSetting]));
 
     // Mock confirm to return true
-    (window.confirm as jest.Mock).mockReturnValue(true);
+    (window.confirm as MockFn).mockReturnValue(true);
 
     render(
       <SettingsManager
@@ -313,7 +315,7 @@ describe('SettingsManager Component', () => {
   });
 
   test('does not delete setting when delete is cancelled', async () => {
-    const mockOnLoadSetting = jest.fn();
+    const mockOnLoadSetting = vi.fn();
 
     // Pre-populate localStorage with a setting
     const testSetting = {
@@ -324,7 +326,7 @@ describe('SettingsManager Component', () => {
     localStorage.setItem('lifeplan-simulator-settings', JSON.stringify([testSetting]));
 
     // Mock confirm to return false
-    (window.confirm as jest.Mock).mockReturnValue(false);
+    (window.confirm as MockFn).mockReturnValue(false);
 
     render(
       <SettingsManager

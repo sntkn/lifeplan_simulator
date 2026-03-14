@@ -3,7 +3,6 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { ResultsTable } from '../components/results/ResultsTable';
 import type { YearlyData } from '../types/simulation';
 

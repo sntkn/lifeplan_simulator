@@ -6,6 +6,7 @@
  */
 
 import type { SimulationParams } from '../types/simulation';
+import { vi } from 'vitest';
 
 // Test data
 const mockParams: SimulationParams = {
@@ -48,7 +49,7 @@ const mockParams: SimulationParams = {
 describe('Settings UI Integration Tests', () => {
   beforeEach(() => {
     localStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Settings Storage Functionality', () => {

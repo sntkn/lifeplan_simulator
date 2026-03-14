@@ -3,12 +3,15 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { AIAdvisorPanel } from '../components/ai/AIAdvisorPanel';
 import * as aiAdvisor from '../services/aiAdvisor';
 import type { SimulationParams, YearlyData } from '../types/simulation';
+import type { Mock } from 'vitest';
 
-jest.mock('../services/aiAdvisor');
+vi.mock('../services/aiAdvisor');
+
+type MockFn = Mock;
 
 const mockParams: SimulationParams = {
   initialAge: 30,
@@ -64,9 +67,9 @@ const mockSimulationData: YearlyData[] = [
 
 describe('AIAdvisorPanel Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
-    (aiAdvisor.getDefaultAIConfig as jest.Mock).mockReturnValue({
+    (aiAdvisor.getDefaultAIConfig as MockFn).mockReturnValue({
       provider: 'ollama',
       model: 'llama3.1:8b',
       endpoint: 'http://localhost:11434'
@@ -122,8 +125,8 @@ describe('AIAdvisorPanel Component', () => {
       confidence: 0.85
     };
 
-    const mockGenerateAdvice = jest.fn().mockResolvedValue(mockAdvice);
-    (aiAdvisor.AIAdvisorService as jest.Mock).mockImplementation(() => ({
+    const mockGenerateAdvice = vi.fn().mockResolvedValue(mockAdvice);
+    (aiAdvisor.AIAdvisorService as MockFn).mockImplementation(() => ({
       generateAdvice: mockGenerateAdvice
     }));
 
@@ -142,10 +145,10 @@ describe('AIAdvisorPanel Component', () => {
   });
 
   test('shows loading state during advice generation', async () => {
-    const mockGenerateAdvice = jest.fn().mockImplementation(() =>
+    const mockGenerateAdvice = vi.fn().mockImplementation(() =>
       new Promise(resolve => setTimeout(resolve, 100))
     );
-    (aiAdvisor.AIAdvisorService as jest.Mock).mockImplementation(() => ({
+    (aiAdvisor.AIAdvisorService as MockFn).mockImplementation(() => ({
       generateAdvice: mockGenerateAdvice
     }));
 
@@ -159,8 +162,8 @@ describe('AIAdvisorPanel Component', () => {
   });
 
   test('shows error message on failure', async () => {
-    const mockGenerateAdvice = jest.fn().mockRejectedValue(new Error('API Error'));
-    (aiAdvisor.AIAdvisorService as jest.Mock).mockImplementation(() => ({
+    const mockGenerateAdvice = vi.fn().mockRejectedValue(new Error('API Error'));
+    (aiAdvisor.AIAdvisorService as MockFn).mockImplementation(() => ({
       generateAdvice: mockGenerateAdvice
     }));
 
@@ -181,8 +184,8 @@ describe('AIAdvisorPanel Component', () => {
   });
 
   test('updates AI config', () => {
-    const mockSaveAIConfig = jest.fn();
-    (aiAdvisor.saveAIConfig as jest.Mock) = mockSaveAIConfig;
+    const mockSaveAIConfig = vi.fn();
+    (aiAdvisor.saveAIConfig as MockFn) = mockSaveAIConfig;
 
     render(<AIAdvisorPanel params={mockParams} simulationData={mockSimulationData} />);
 
@@ -204,8 +207,8 @@ describe('AIAdvisorPanel Component', () => {
       confidence: 0.85
     };
 
-    const mockGenerateAdvice = jest.fn().mockResolvedValue(mockAdvice);
-    (aiAdvisor.AIAdvisorService as jest.Mock).mockImplementation(() => ({
+    const mockGenerateAdvice = vi.fn().mockResolvedValue(mockAdvice);
+    (aiAdvisor.AIAdvisorService as MockFn).mockImplementation(() => ({
       generateAdvice: mockGenerateAdvice
     }));
 

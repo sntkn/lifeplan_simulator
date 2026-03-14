@@ -18,11 +18,11 @@ npm install
 npm run dev
 ```
 
-Vite の dev サーバーは `http://localhost:5173` で起動します。`npm run build` で本番ビルド、`npm run test` で Jest テストを実行できます。
+Vite の dev サーバーは `http://localhost:5173` で起動します。`npm run build` で本番ビルド、`npm run test` で Vitest を実行できます。
 
 ## 技術スタック
 
-React、TypeScript、Vite、Tailwind CSS、Recharts、Jest、Testing Library、ESLint。
+React、TypeScript、Vite、Tailwind CSS、Recharts、Vitest、Testing Library、ESLint。
 
 ## ライセンス
 

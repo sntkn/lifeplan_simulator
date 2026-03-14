@@ -3,7 +3,7 @@
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { InputPanel } from '../components/forms/InputPanel';
 import type { SimulationParams } from '../types/simulation';
 
@@ -45,11 +45,11 @@ const mockParams: SimulationParams = {
 };
 
 describe('InputPanel Component', () => {
-  const mockSetParams = jest.fn();
-  const mockOnSimulate = jest.fn();
+  const mockSetParams = vi.fn();
+  const mockOnSimulate = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders panel title', () => {

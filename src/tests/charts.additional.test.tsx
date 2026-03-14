@@ -3,7 +3,6 @@
  */
 
 import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { AssetChart } from '../components/charts/AssetChart';
 import { AssetBreakdownChart } from '../components/charts/AssetBreakdownChart';
 import type { YearlyData } from '../types/simulation';
