@@ -2,11 +2,11 @@
 
 ## Project Structure & Module Organization
 
-Lifeplan Simulator is a Vite + React + TypeScript app. Application code sits in `src/`; UI is split into `components/` (charts, forms, results, ai), reusable hooks in `hooks/`, simulation math and formatters in `services/` and `utils/`, and shared shapes in `types/`. Store fixtures or browser-mocking helpers in `src/tests/` and heavier Jest doubles inside the top-level `__mocks__/`. Static assets belong to `public/`, while production bundles land in `dist/`. Update datasets such as `historicalData.ts` whenever market ranges change so calculations stay in sync.
+Lifeplan Simulator is a Vite + React + TypeScript app. Application code sits in `src/`; UI is split into `components/` (charts, forms, results, ai), reusable hooks in `hooks/`, simulation math and formatters in `services/` and `utils/`, and shared shapes in `types/`. Store fixtures or browser-mocking helpers in `src/tests/` and heavier test doubles inside the top-level `__mocks__/`. Static assets belong to `public/`, while production bundles land in `dist/`. Update datasets such as `historicalData.ts` whenever market ranges change so calculations stay in sync.
 
 ## Build, Test, and Development Commands
 
-Use `npm install` once per clone. `npm run dev` starts the Vite dev server at http://localhost:5173. `npm run build` runs TypeScript project references then creates the production bundle. `npm run preview` serves that bundle, which is the fastest way to vet Tailwind styles and charts before shipping. `npm run lint` executes the shared ESLint profile, and `npm run test` runs Jest in jsdom (append `--watch` or `--coverage` as needed).
+Use `npm install` once per clone. `npm run dev` starts the Vite dev server at http://localhost:5173. `npm run build` runs TypeScript project references then creates the production bundle. `npm run preview` serves that bundle, which is the fastest way to vet Tailwind styles and charts before shipping. `npm run lint` executes the shared ESLint profile, and `npm run test` runs Vitest in jsdom (append `--watch` or `--coverage` as needed).
 
 ## Coding Style & Naming Conventions
 
@@ -14,7 +14,7 @@ Stick to 2-space indentation, semicolons, and single quotes for strings/imports.
 
 ## Testing Guidelines
 
-Jest with Testing Library powers all automated tests. Preferred naming is `*.test.tsx` (UI) or `*.test.ts` (logic) placed near the feature folder or in `src/tests/`. When adjusting core simulations, cover both Monte Carlo and historical flows and include representative parameters so regressions surface quickly. Generate coverage locally with `npm run test -- --coverage`; the `coverage/` directory is already gitignored.
+Vitest with Testing Library powers all automated tests. Preferred naming is `*.test.tsx` (UI) or `*.test.ts` (logic) placed near the feature folder or in `src/tests/`. When adjusting core simulations, cover both Monte Carlo and historical flows and include representative parameters so regressions surface quickly. Generate coverage locally with `npm run test -- --coverage`; the `coverage/` directory is already gitignored.
 
 ## Commit & Pull Request Guidelines
 

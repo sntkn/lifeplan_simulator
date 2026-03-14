@@ -3,14 +3,18 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
+import { vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { useSimulation } from '../hooks/useSimulation';
 import * as simulationEngine from '../utils/simulationEngine';
 
-jest.mock('../utils/simulationEngine');
+vi.mock('../utils/simulationEngine');
+
+type MockFn = Mock;
 
 describe('useSimulation Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('initializes with default params', () => {
@@ -44,7 +48,7 @@ describe('useSimulation Hook', () => {
 
   test('runs monte carlo simulation', () => {
     const mockData = [{ year: 0, age: 30, median: 1000000, p90: 1200000, p75: 1100000, p25: 900000, p10: 800000, medianStock: 500000, medianCrypto: 300000, medianCash: 200000 }];
-    (simulationEngine.runMonteCarloSimulation as jest.Mock).mockReturnValue(mockData);
+    (simulationEngine.runMonteCarloSimulation as MockFn).mockReturnValue(mockData);
 
     const { result } = renderHook(() => useSimulation());
 
@@ -58,7 +62,7 @@ describe('useSimulation Hook', () => {
 
   test('runs historical simulation', () => {
     const mockData = [{ year: 0, age: 30, median: 1000000, p90: 1200000, p75: 1100000, p25: 900000, p10: 800000, medianStock: 500000, medianCrypto: 300000, medianCash: 200000 }];
-    (simulationEngine.runHistoricalSimulation as jest.Mock).mockReturnValue(mockData);
+    (simulationEngine.runHistoricalSimulation as MockFn).mockReturnValue(mockData);
 
     const { result } = renderHook(() => useSimulation());
 

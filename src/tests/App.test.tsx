@@ -3,23 +3,23 @@
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import App from '../App';
 
 // Mock child components
-jest.mock('../components/charts/AssetChart', () => ({
+vi.mock('../components/charts/AssetChart', () => ({
   AssetChart: () => <div data-testid="asset-chart">AssetChart</div>
 }));
 
-jest.mock('../components/charts/AssetBreakdownChart', () => ({
+vi.mock('../components/charts/AssetBreakdownChart', () => ({
   AssetBreakdownChart: () => <div data-testid="asset-breakdown-chart">AssetBreakdownChart</div>
 }));
 
-jest.mock('../components/results/ResultsTable', () => ({
+vi.mock('../components/results/ResultsTable', () => ({
   ResultsTable: () => <div data-testid="results-table">ResultsTable</div>
 }));
 
-jest.mock('../components/forms/InputPanel', () => ({
+vi.mock('../components/forms/InputPanel', () => ({
   InputPanel: ({ onSimulate }: any) => (
     <div data-testid="input-panel">
       <button onClick={onSimulate}>シミュレーション実行</button>
@@ -27,11 +27,11 @@ jest.mock('../components/forms/InputPanel', () => ({
   )
 }));
 
-jest.mock('../components/ai/AIAdvisorPanel', () => ({
+vi.mock('../components/ai/AIAdvisorPanel', () => ({
   AIAdvisorPanel: () => <div data-testid="ai-advisor-panel">AIAdvisorPanel</div>
 }));
 
-jest.mock('../hooks/useSimulation', () => ({
+vi.mock('../hooks/useSimulation', () => ({
   useSimulation: () => ({
     params: {
       initialAge: 30,
@@ -39,9 +39,9 @@ jest.mock('../hooks/useSimulation', () => ({
       simulationMethod: 'montecarlo',
       numSimulations: 1000,
     },
-    setParams: jest.fn(),
+    setParams: vi.fn(),
     simulationData: null,
-    runSimulation: jest.fn(),
+    runSimulation: vi.fn(),
     simulationPeriod: 35,
   })
 }));

@@ -1,8 +1,9 @@
 /**
- * Jest setup file for testing environment
+ * Vitest setup file for testing environment
  */
 
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -19,29 +20,37 @@ const localStorageMock = (() => {
 
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
+  writable: true,
 });
 
 // Mock window.alert
 Object.defineProperty(window, 'alert', {
-  value: jest.fn(),
+  value: vi.fn(),
+  writable: true,
 });
 
 // Mock window.confirm
 Object.defineProperty(window, 'confirm', {
-  value: jest.fn(() => true),
+  value: vi.fn(() => true),
+  writable: true,
 });
 
 // Mock console methods to avoid noise in tests
-global.console = {
+globalThis.console = {
   ...console,
-  log: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+  log: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
 };
 
 // Mock ResizeObserver for recharts
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
+const resizeObserverMock = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
 }));
+
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  value: resizeObserverMock,
+  writable: true,
+});

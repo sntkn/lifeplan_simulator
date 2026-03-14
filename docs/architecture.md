@@ -5,7 +5,7 @@
 - React + TypeScript + Vite（`npm run dev/build/preview`）
 - Tailwind CSS でレイアウトとテーマ（ダークモード対応）
 - Recharts を用いたチャート描画
-- ESLint + TypeScript ESLint で静的解析、Jest + Testing Library で UI/ロジック検証
+- ESLint + TypeScript ESLint で静的解析、Vitest + Testing Library で UI/ロジック検証
 
 ## モジュール構成
 
@@ -14,7 +14,7 @@
 - `src/services/`：モンテカルロ/ヒストリカル計算や資産調整などビジネスロジック
 - `src/utils/`：フォーマッタ、共通計算、乱数や配列ユーティリティ
 - `src/types/`：シミュレーション結果・入力パラメータの型定義
-- `src/tests/` と `__mocks__/`：Jest テストとモック実装
+- `src/tests/` と `__mocks__/`：Vitest テストとモック実装
 - `public/`：静的アセット、`dist/`：ビルド成果物
 
 ## データソース
