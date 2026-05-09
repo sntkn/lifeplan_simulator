@@ -16,3 +16,9 @@ updates:
           - "patch"
     cooldown:
       default-days: 7
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
