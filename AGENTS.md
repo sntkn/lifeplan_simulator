@@ -28,7 +28,18 @@ Never commit personal financial inputs; rely on anonymized defaults or sample fi
 
 Before proposing architecture or implementation changes, review the canonical references under `docs/`:
 
+- `docs/agent-guide.md` — コーディングエージェント向けの読む順と作業別参照先
 - `docs/feature-overview.md` — 機能概要とシミュレーション手法
 - `docs/specification.md` — 入力項目、運用ルール、表示仕様
 - `docs/architecture.md` — 技術スタック、モジュール分割、データフロー
+- `docs/skills/coding-guidelines.md` — 実装時に参照するスキル
+- `docs/skills/testing-guidelines.md` — UT 追加・修正時に参照するスキル
+- `docs/skills/domain-glossary.md` — 用語集とざっくり仕様
 Keep these files updated alongside code; AI agents are expected to consult and synchronize them when designing or modifying features.
+
+プロジェクト固有の Codex スキルは `.agents/skills/` に置く:
+
+- `lifeplan-agent-guide` — 作業開始時の目次と参照順
+- `lifeplan-coding` — 実装・リファクタリング時のスキル
+- `lifeplan-testing` — UT・モック・カバレッジ確認時のスキル
+- `lifeplan-domain` — 用語、単位、計算仕様確認時のスキル

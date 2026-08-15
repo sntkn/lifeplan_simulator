@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lifeplan テスティング"
+  short_description: "UT追加・修正時に確認するスキル。"
+  default_prompt: "$lifeplan-testing を使って、Lifeplan Simulator のテスト追加・修正を進めてください。"

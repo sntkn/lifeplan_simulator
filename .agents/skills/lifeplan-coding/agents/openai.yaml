@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lifeplan コーディング"
+  short_description: "実装時の作業手順を確認するスキル。"
+  default_prompt: "$lifeplan-coding を使って、Lifeplan Simulator の実装変更を進めてください。"
