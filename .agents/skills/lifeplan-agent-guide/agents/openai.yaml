@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lifeplan エージェント目次"
+  short_description: "作業開始時の読む順を確認するスキル。"
+  default_prompt: "$lifeplan-agent-guide を使って、Lifeplan Simulator の変更前に読む資料を確認してください。"

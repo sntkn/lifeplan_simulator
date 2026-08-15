@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lifeplan ドメイン"
+  short_description: "用語とざっくり仕様を確認するスキル。"
+  default_prompt: "$lifeplan-domain を使って、Lifeplan Simulator の用語・単位・仕様を確認してください。"
