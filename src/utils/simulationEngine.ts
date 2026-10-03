@@ -156,7 +156,7 @@ const runSingleSimulation = (
     // Calculate returns using the provided strategy
     const { stockReturn, cryptoReturn, inflationRate } = returnCalculator.calculateReturns(year, startYear);
 
-    // Apply investment returns
+    // 投資リターンは株式・仮想通貨の残高に直接適用する（インフレ率は掛けない）。
     stockValue *= (1 + stockReturn);
     cryptoValue *= (1 + cryptoReturn);
 
@@ -327,7 +327,7 @@ const runSingleSimulation = (
     yearlyCryptoValues.push(cryptoValue);
     yearlyCashValues.push(cashValue);
 
-    // Apply inflation for next year
+    // インフレ率は翌年の生活費・収入等に適用し、資産残高には適用しない。
     currentLivingExpenses *= (1 + inflationRate);
     currentEntertainmentExpenses *= (1 + inflationRate);
     currentHousingMaintenance *= (1 + inflationRate);
