@@ -9,20 +9,6 @@ import {
 } from '../historicalData';
 
 // --- Simulation Configuration ---
-/**
- * ヒストリカルシミュレーションの実行回数を計算します
- * 30年を超える場合でも循環データを使用して複数パターンを確保
- */
-const calculateHistoricalSimulationCount = (simulationPeriod: number): number => {
-  if (simulationPeriod >= HISTORICAL_DATA_LENGTH) {
-    // 30年ちょうど、あるいはそれ以上は循環データを利用して常に最大パターン数を確保
-    return MAX_START_YEARS;
-  }
-
-  const maxIndependentPatterns = Math.max(1, HISTORICAL_DATA_LENGTH - simulationPeriod + 1);
-  return Math.min(MAX_START_YEARS, maxIndependentPatterns);
-};
-
 // --- Return Calculation Strategies ---
 interface ReturnCalculator {
   calculateReturns(yearIndex: number, startYear?: number): {
@@ -461,30 +447,17 @@ export const runHistoricalSimulation = (params: SimulationParams): YearlyData[] 
   }
 
   const simulationPeriod = params.endAge - params.initialAge;
-  const useCyclicData = simulationPeriod >= HISTORICAL_DATA_LENGTH;
+  // 期間にかかわらず、30個すべての開始位置から循環シナリオを作る。
+  const useCyclicData = true;
   const returnCalculator = new HistoricalReturnCalculator(
     params.stockRegion || 'sp500',
     params.inflationRegion || 'japan',
     useCyclicData
   );
-  const availableStartCount = useCyclicData
-    ? HISTORICAL_DATA_LENGTH
-    : Math.max(1, HISTORICAL_DATA_LENGTH - simulationPeriod + 1);
-  const desiredSimulationCount = calculateHistoricalSimulationCount(simulationPeriod);
-  const actualStartYears = Math.min(desiredSimulationCount, availableStartCount);
+  const selectedStartYears = Array.from({ length: MAX_START_YEARS }, (_, i) => i);
 
-  // 利用可能な開始年（循環しない期間では末尾を超えない範囲に限定）をシャッフル
-  const startYearCandidates = Array.from({ length: availableStartCount }, (_, i) => i);
-  for (let i = startYearCandidates.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [startYearCandidates[i], startYearCandidates[j]] = [startYearCandidates[j], startYearCandidates[i]];
-  }
-  const selectedStartYears = startYearCandidates.slice(0, actualStartYears);
-
-  console.log(`Running ${actualStartYears} simulations for ${simulationPeriod} years`);
-  if (useCyclicData) {
-    console.log(`Using cyclic historical data (${HISTORICAL_DATA_LENGTH} years repeated)`);
-  }
+  console.log(`Running ${selectedStartYears.length} simulations for ${simulationPeriod} years`);
+  console.log(`Using cyclic historical data (${HISTORICAL_DATA_LENGTH} years repeated)`);
 
   const allSimulations: number[][] = [];
   const allStockSimulations: number[][] = [];

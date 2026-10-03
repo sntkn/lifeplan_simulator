@@ -126,9 +126,9 @@ describe('InputPanel Component', () => {
     }));
   });
 
-  test('shows warning for long simulation periods', () => {
-    const longParams = { ...mockParams, simulationMethod: 'historical' as const, endAge: 100 };
-    render(<InputPanel params={longParams} setParams={mockSetParams} onSimulate={mockOnSimulate} />);
-    expect(screen.getByText(/30年を超える期間では/)).toBeInTheDocument();
+  test('explains that historical data is cycled for every simulation length', () => {
+    const historicalParams = { ...mockParams, simulationMethod: 'historical' as const, endAge: 70 };
+    render(<InputPanel params={historicalParams} setParams={mockSetParams} onSimulate={mockOnSimulate} />);
+    expect(screen.getByText(/期間にかかわらず、1996〜2025年のデータを循環使用/)).toBeInTheDocument();
   });
 });
