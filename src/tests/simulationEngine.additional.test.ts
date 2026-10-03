@@ -266,4 +266,19 @@ describe('Simulation Engine Additional Coverage', () => {
     expect(result).toBeInstanceOf(Array);
     expect(result.length).toBe(31);
   });
+
+  test('uses the same historical start positions for different simulation lengths', () => {
+    const shortParams = {
+      ...baseParams,
+      initialAge: 50,
+      endAge: 75,
+      simulationMethod: 'historical' as const
+    };
+    const longParams = { ...shortParams, endAge: 80 };
+
+    const shortResult = runHistoricalSimulation(shortParams);
+    const longResult = runHistoricalSimulation(longParams);
+
+    expect(shortResult.find(data => data.age === 55)).toEqual(longResult.find(data => data.age === 55));
+  });
 });

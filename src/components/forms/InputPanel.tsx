@@ -68,10 +68,9 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
             <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded text-sm mb-3">
               <p className="font-bold mb-2">ヒストリカル法について：</p>
               <p>• 過去30年データを使用（1996-2025年）</p>
-              <p>• 複数の開始年でシミュレーション実行</p>
-              <p>• 実際の市場変動パターンを再現</p>
-              <p>• 仮想通貨：2014年以前は株式リターンを適用</p>
-              <p className="text-blue-600 dark:text-blue-400 font-bold">※ 30年超の場合は循環データを使用</p>
+              <p>• 30通りの開始位置でシミュレーション実行</p>
+              <p>• 期間にかかわらず、1996〜2025年のデータを循環使用</p>
+              <p>• 仮想通貨：2014年以前はS&amp;P500のリターンを代用</p>
             </div>
 
             <label className="block mb-1 font-bold">株式リターンの地域</label>
@@ -128,12 +127,6 @@ export const InputPanel = ({ params, setParams, onSimulate }: InputPanelProps) =
           min={params.initialAge + 1}
           max={120}
         />
-        {params.simulationMethod === 'historical' && (params.endAge - params.initialAge) > 30 && (
-          <div className="mt-1 text-sm text-blue-600 dark:text-blue-400">
-            30年を超える期間では、ヒストリカルデータを循環使用します
-          </div>
-        )}
-
         {params.simulationMethod === 'montecarlo' && (
           <>
             <NumberInput
